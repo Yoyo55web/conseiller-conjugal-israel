@@ -16,6 +16,7 @@ const CTA_NOTE = "mt-3 text-xs text-gray-600";
 
 // Spacing cohérent “premium”
 const SECTION_Y = "py-16";
+const HERO_Y = "py-20 sm:py-24";
 const CONTAINER = "max-w-6xl mx-auto px-6";
 const CARD = "rounded-2xl border border-gray-200 bg-white p-6";
 const CARD_SOFT = "rounded-3xl border border-gray-200 bg-gray-50 p-8";
@@ -33,10 +34,13 @@ export default function Home() {
             priority
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-white/70" />
+
+          {/* Overlay premium : plus de contraste, moins “lavé” */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-white/55 to-white/80" />
+          <div className="absolute inset-0 bg-black/10" />
         </div>
 
-        <div className={`relative ${CONTAINER} ${SECTION_Y}`}>
+        <div className={`relative ${CONTAINER} ${HERO_Y}`}>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             {/* Colonne GAUCHE = message / confiance */}
             <div className="space-y-7">
@@ -44,8 +48,8 @@ export default function Home() {
                 {[
                   "Confidentialité totale",
                   "Neutralité",
-                  "Visio / Présentiel",
-                  "Public francophone • Visio partout",
+                  "Présentiel à Netanya",
+                  "Visio en français • Monde entier",
                 ].map((b) => (
                   <span
                     key={b}
@@ -56,13 +60,21 @@ export default function Home() {
                 ))}
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
-                Clarifier votre situation de couple et avancer avec plus de sérénité
+              {/* ✅ H1 plus “stop scroll” */}
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight text-balance">
+                Vous souffrez en couple… mais en silence ?
               </h1>
+
+              {/* Ligne claire “où / comment” */}
+              <p className="text-sm sm:text-base text-gray-800">
+                <span className="font-semibold">Présentiel :</span> Netanya •{" "}
+                <span className="font-semibold">Visio :</span> partout dans le monde
+                (français)
+              </p>
 
               <p className="text-lg leading-relaxed text-gray-700 max-w-2xl">
                 Tensions, incompréhensions, décisions difficiles :{" "}
-                <strong>on fait le point clairement</strong> et on avance avec un{" "}
+                <strong>on fait le point clairement</strong>, avec un{" "}
                 <strong>accompagnement structuré, neutre et confidentiel</strong>.
               </p>
 
@@ -77,13 +89,15 @@ export default function Home() {
             </div>
 
             {/* Colonne DROITE = actions (CTA) */}
-            <div className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur p-10">
+            <div className="rounded-3xl border border-gray-200 bg-white/85 backdrop-blur p-10 shadow-sm">
               <h2 className="text-xl font-semibold">
                 Ce que vous obtenez dès la première séance
               </h2>
 
               <ul className="mt-5 space-y-3 text-gray-800">
-                <li>• Une lecture claire de la situation (ce qui bloque réellement)</li>
+                <li>
+                  • Une lecture claire de la situation (ce qui bloque réellement)
+                </li>
                 <li>• Des outils simples pour apaiser et mieux communiquer</li>
                 <li>• Un objectif précis + un plan concret entre les séances</li>
                 <li>• Un cadre sécurisant, sans jugement et sans prise de parti</li>
@@ -104,7 +118,7 @@ export default function Home() {
                 </a>
               </div>
 
-              {/* ✅ Micro-réassurance unique (à droite, sous les boutons) */}
+              {/* Micro-réassurance */}
               <p className={CTA_NOTE}>
                 Réponse rapide • Échanges confidentiels • Sans engagement
               </p>
@@ -119,6 +133,11 @@ export default function Home() {
           <h2 className="text-2xl font-semibold">
             À qui s’adresse cet accompagnement ?
           </h2>
+
+          {/* ✅ micro-identification */}
+          <p className="mt-3 text-gray-700 leading-relaxed max-w-3xl">
+            Si vous vous reconnaissez, vous êtes au bon endroit.
+          </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
@@ -155,7 +174,10 @@ export default function Home() {
             <div className="grid gap-4">
               {[
                 ["1. Diagnostic", "Comprendre ce qui se joue et clarifier les blocages."],
-                ["2. Besoins & objectifs", "Définir un objectif clair et réaliste, adapté à votre situation."],
+                [
+                  "2. Besoins & objectifs",
+                  "Définir un objectif clair et réaliste, adapté à votre situation.",
+                ],
                 ["3. Outils", "Mettre en place des outils applicables dès la maison."],
                 ["4. Plan & suivi", "Avancer étape par étape pour stabiliser les progrès."],
               ].map(([title, desc]) => (
@@ -211,10 +233,19 @@ export default function Home() {
 
           <div className="mt-10 grid gap-4 md:grid-cols-2">
             {[
-              ["Confidentialité totale", "Un espace sûr pour parler librement, sans jugement."],
-              ["Neutralité", "Aucune prise de parti : on travaille la relation et les solutions."],
+              [
+                "Confidentialité totale",
+                "Un espace sûr pour parler librement, sans jugement.",
+              ],
+              [
+                "Neutralité",
+                "Aucune prise de parti : on travaille la relation et les solutions.",
+              ],
               ["Structure claire", "Un objectif + des étapes concrètes, pas du flou."],
-              ["Approche adaptée", "Respect de votre rythme, de vos valeurs et de votre cadre de vie."],
+              [
+                "Approche adaptée",
+                "Respect de votre rythme, de vos valeurs et de votre cadre de vie.",
+              ],
             ].map(([title, desc]) => (
               <div key={title} className={CARD}>
                 <div className="font-semibold">{title}</div>
@@ -232,7 +263,7 @@ export default function Home() {
             <div className="max-w-2xl">
               <h2 className="text-2xl font-semibold">Préparation au mariage</h2>
               <p className="mt-2 text-gray-700 leading-relaxed">
-                Une préparation structurée pour clarifier les attentes, poser un cadre clair
+                Une préparation structurée pour clarifier les attentes, éviter les erreurs
                 et partir sur des bases solides dès le départ.
               </p>
             </div>
@@ -273,7 +304,10 @@ export default function Home() {
             {[
               ["Est-ce confidentiel ?", "Oui, totalement. Les échanges restent privés."],
               ["Combien de séances ?", "Souvent 4 à 8 selon la situation, parfois moins."],
-              ["Visio ou présentiel ?", "Les deux sont possibles. On choisit ce qui vous convient."],
+              [
+                "Où ont lieu les consultations ?",
+                "En présentiel à Netanya, ou en visio partout dans le monde (en français).",
+              ],
               ["Peut-on commencer seul ?", "Oui, c’est possible si l’autre ne souhaite pas encore venir."],
             ].map(([q, a]) => (
               <div key={q} className="rounded-2xl border border-gray-200 bg-white p-6">
