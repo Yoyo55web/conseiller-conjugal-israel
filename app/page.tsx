@@ -78,14 +78,22 @@ export default function Home() {
                 <strong>accompagnement structuré, neutre et confidentiel</strong>.
               </p>
 
-              <div className="text-sm text-gray-700">
-                <a
-                  href="/qui-sommes-nous"
-                  className="underline underline-offset-4 hover:no-underline"
-                >
-                  En savoir plus sur l’accompagnement
-                </a>
-              </div>
+              <div className="text-sm text-gray-700 flex flex-wrap gap-x-4 gap-y-2">
+  <a
+    href="/qui-sommes-nous"
+    className="underline underline-offset-4 hover:no-underline"
+  >
+    En savoir plus sur l’accompagnement
+  </a>
+
+  <a
+    href="/consultation-netanya"
+    className="underline underline-offset-4 hover:no-underline"
+  >
+    Consultation à Netanya (présentiel)
+  </a>
+</div>
+
             </div>
 
             {/* Colonne DROITE = actions (CTA) */}
@@ -342,6 +350,10 @@ export default function Home() {
                 Page contact
               </a>
             </div>
+<p className="mt-4 text-sm text-gray-700">
+  <span className="font-semibold">Présentiel :</span> Netanya •{" "}
+  <span className="font-semibold">Visio :</span> consultations en français, partout dans le monde
+</p>
 
             <p className="mt-5 text-xs text-gray-600">
               Téléphone : <span className="font-semibold">+972 58 536 05 10</span> • Sans engagement • Confidentialité totale
