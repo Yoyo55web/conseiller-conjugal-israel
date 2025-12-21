@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
 
+function track(eventName: string, params?: Record<string, any>) {
+  // GA4 (gtag) est injecté dans layout.tsx
+  (window as any).gtag?.("event", eventName, params || {});
+}
+
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
@@ -58,6 +63,12 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
+            onClick={() =>
+              track("lead_whatsapp_click", {
+                placement: "header_desktop_prendre_rdv",
+                page: "global",
+              })
+            }
           >
             Prendre RDV
           </a>
@@ -68,6 +79,12 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-3 py-2 text-sm font-medium whitespace-nowrap"
+            onClick={() =>
+              track("lead_whatsapp_click", {
+                placement: "header_mobile_rdv",
+                page: "global",
+              })
+            }
           >
             RDV
           </a>
@@ -130,7 +147,13 @@ export default function SiteHeader() {
 
               <a
                 href={WHATSAPP_LINK}
-                onClick={close}
+                onClick={() => {
+                  track("lead_whatsapp_click", {
+                    placement: "header_mobile_drawer_whatsapp",
+                    page: "global",
+                  });
+                  close();
+                }}
                 className="mt-2 inline-flex items-center justify-center rounded-md bg-green-600 text-white px-4 py-3 text-sm font-medium"
               >
                 Écrire sur WhatsApp
