@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 function track(eventName: string, params?: Record<string, any>) {
-  // GA4 (gtag) est injecté dans layout.tsx
   (window as any).gtag?.("event", eventName, params || {});
 }
 
@@ -120,12 +119,16 @@ export default function Home() {
                 <a
                   href={WHATSAPP_LINK}
                   className={CTA_PRIMARY}
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.preventDefault();
                     track("lead_whatsapp_click", {
                       placement: "home_hero_primary",
                       page: "home",
-                    })
-                  }
+                    });
+                    setTimeout(() => {
+                      window.location.href = WHATSAPP_LINK;
+                    }, 150);
+                  }}
                 >
                   Écrire sur WhatsApp
                 </a>
@@ -242,12 +245,16 @@ export default function Home() {
                   <a
                     href={WHATSAPP_LINK}
                     className={CTA_PRIMARY}
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.preventDefault();
                       track("lead_whatsapp_click", {
                         placement: "home_method_card",
                         page: "home",
-                      })
-                    }
+                      });
+                      setTimeout(() => {
+                        window.location.href = WHATSAPP_LINK;
+                      }, 150);
+                    }}
                   >
                     Écrire sur WhatsApp
                   </a>
@@ -375,12 +382,16 @@ export default function Home() {
               <a
                 href={WHATSAPP_LINK}
                 className={CTA_PRIMARY}
-                onClick={() =>
+                onClick={(e) => {
+                  e.preventDefault();
                   track("lead_whatsapp_click", {
                     placement: "home_contact_primary",
                     page: "home",
-                  })
-                }
+                  });
+                  setTimeout(() => {
+                    window.location.href = WHATSAPP_LINK;
+                  }, 150);
+                }}
               >
                 Écrire sur WhatsApp (le plus rapide)
               </a>
