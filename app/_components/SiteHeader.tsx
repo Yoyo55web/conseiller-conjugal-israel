@@ -8,13 +8,24 @@ const WHATSAPP_LINK =
 function track(eventName: string, params?: Record<string, any>) {
   if (typeof window === "undefined") return;
 
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
+  const w = window as any;
+
+  // ✅ Priorité : GA4 direct
+  if (typeof w.gtag === "function") {
+    w.gtag("event", eventName, {
+      ...(params || {}),
+      transport_type: "beacon",
+    });
+    return;
+  }
+
+  // ✅ Fallback : dataLayer
+  w.dataLayer = w.dataLayer || [];
+  w.dataLayer.push({
     event: eventName,
     ...params,
   });
 }
-
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -69,16 +80,12 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() =>
               track("lead_whatsapp_click", {
                 placement: "header_desktop_prendre_rdv",
                 page: "global",
-              });
-              setTimeout(() => {
-                window.location.href = WHATSAPP_LINK;
-              }, 150);
-            }}
+              })
+            }
           >
             Prendre RDV
           </a>
@@ -89,16 +96,12 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-3 py-2 text-sm font-medium whitespace-nowrap"
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() =>
               track("lead_whatsapp_click", {
                 placement: "header_mobile_rdv",
                 page: "global",
-              });
-              setTimeout(() => {
-                window.location.href = WHATSAPP_LINK;
-              }, 150);
-            }}
+              })
+            }
           >
             RDV
           </a>
@@ -161,16 +164,12 @@ export default function SiteHeader() {
 
               <a
                 href={WHATSAPP_LINK}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   track("lead_whatsapp_click", {
                     placement: "header_mobile_drawer_whatsapp",
                     page: "global",
                   });
                   close();
-                  setTimeout(() => {
-                    window.location.href = WHATSAPP_LINK;
-                  }, 150);
                 }}
                 className="mt-2 inline-flex items-center justify-center rounded-md bg-green-600 text-white px-4 py-3 text-sm font-medium"
               >
