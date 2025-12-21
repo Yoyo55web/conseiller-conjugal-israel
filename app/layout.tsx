@@ -18,8 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <head>
-        {/* Google Analytics GA4 — chargé AVANT l'interaction */}
+      <body className="bg-white text-black">
+        {/* ✅ Google Analytics GA4 — DOIT être dans body (App Router) */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="beforeInteractive"
@@ -37,9 +37,7 @@ export default function RootLayout({
             });
           `}
         </Script>
-      </head>
 
-      <body className="bg-white text-black">
         <SiteHeader />
 
         {/* CONTENU des pages */}
