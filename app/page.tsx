@@ -1,8 +1,15 @@
 import Image from "next/image";
 
 function track(eventName: string, params?: Record<string, any>) {
-  (window as any).gtag?.("event", eventName, params || {});
+  if (typeof window === "undefined") return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: eventName,
+    ...params,
+  });
 }
+
 
 const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20faire%20le%20point%20sur%20ma%20situation.%20Voici%20en%202-3%20phrases%20ce%20que%20je%20vis%20%3A%20";

@@ -6,8 +6,15 @@ const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
 
 function track(eventName: string, params?: Record<string, any>) {
-  (window as any).gtag?.("event", eventName, params || {});
+  if (typeof window === "undefined") return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: eventName,
+    ...params,
+  });
 }
+
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
