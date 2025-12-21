@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import SiteHeader from "./_components/SiteHeader";
-
 
 export const metadata: Metadata = {
   title: "Conseiller Conjugal Israël – Accompagnement couples et futurs mariés",
   description:
     "Accompagnement conjugal professionnel : communication, conflits, confiance et préparation au mariage. Visio / présentiel. Public francophone en Israël.",
 };
+
+const GA_MEASUREMENT_ID = "G-8VTREB87B6";
 
 export default function RootLayout({
   children,
@@ -17,6 +19,23 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="bg-white text-black">
+
+        {/* Google Analytics GA4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}', {
+              anonymize_ip: true,
+            });
+          `}
+        </Script>
+
         <SiteHeader />
 
         {/* CONTENU des pages */}
@@ -49,6 +68,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+
       </body>
     </html>
   );
