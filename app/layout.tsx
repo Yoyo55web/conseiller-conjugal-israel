@@ -19,7 +19,6 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="bg-white text-black">
-
         {/* Google Analytics GA4 */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
@@ -29,9 +28,12 @@ export default function RootLayout({
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+
             gtag('js', new Date());
             gtag('config', '${GA_MEASUREMENT_ID}', {
               anonymize_ip: true,
+              send_page_view: true
             });
           `}
         </Script>
@@ -68,7 +70,6 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
-
       </body>
     </html>
   );
