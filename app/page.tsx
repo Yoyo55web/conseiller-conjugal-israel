@@ -1,5 +1,10 @@
 import Image from "next/image";
 
+function track(eventName: string, params?: Record<string, any>) {
+  // GA4 (gtag) est injecté dans layout.tsx
+  (window as any).gtag?.("event", eventName, params || {});
+}
+
 const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20faire%20le%20point%20sur%20ma%20situation.%20Voici%20en%202-3%20phrases%20ce%20que%20je%20vis%20%3A%20";
 
@@ -79,21 +84,20 @@ export default function Home() {
               </p>
 
               <div className="text-sm text-gray-700 flex flex-wrap gap-x-4 gap-y-2">
-  <a
-    href="/qui-sommes-nous"
-    className="underline underline-offset-4 hover:no-underline"
-  >
-    En savoir plus sur l’accompagnement
-  </a>
+                <a
+                  href="/qui-sommes-nous"
+                  className="underline underline-offset-4 hover:no-underline"
+                >
+                  En savoir plus sur l’accompagnement
+                </a>
 
-  <a
-    href="/consultation-netanya"
-    className="underline underline-offset-4 hover:no-underline"
-  >
-    Consultation à Netanya (présentiel)
-  </a>
-</div>
-
+                <a
+                  href="/consultation-netanya"
+                  className="underline underline-offset-4 hover:no-underline"
+                >
+                  Consultation à Netanya (présentiel)
+                </a>
+              </div>
             </div>
 
             {/* Colonne DROITE = actions (CTA) */}
@@ -113,7 +117,16 @@ export default function Home() {
 
               {/* CTA */}
               <div className="mt-7 flex flex-col gap-3">
-                <a href={WHATSAPP_LINK} className={CTA_PRIMARY}>
+                <a
+                  href={WHATSAPP_LINK}
+                  className={CTA_PRIMARY}
+                  onClick={() =>
+                    track("lead_whatsapp_click", {
+                      placement: "home_hero_primary",
+                      page: "home",
+                    })
+                  }
+                >
                   Écrire sur WhatsApp
                 </a>
 
@@ -121,7 +134,16 @@ export default function Home() {
                   Voir la méthode
                 </a>
 
-                <a href={PHONE_TEL} className={CTA_SECONDARY}>
+                <a
+                  href={PHONE_TEL}
+                  className={CTA_SECONDARY}
+                  onClick={() =>
+                    track("lead_phone_click", {
+                      placement: "home_hero_phone",
+                      page: "home",
+                    })
+                  }
+                >
                   Appeler
                 </a>
               </div>
@@ -217,7 +239,16 @@ export default function Home() {
                 </p>
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <a href={WHATSAPP_LINK} className={CTA_PRIMARY}>
+                  <a
+                    href={WHATSAPP_LINK}
+                    className={CTA_PRIMARY}
+                    onClick={() =>
+                      track("lead_whatsapp_click", {
+                        placement: "home_method_card",
+                        page: "home",
+                      })
+                    }
+                  >
                     Écrire sur WhatsApp
                   </a>
                   <a href="/tarifs" className={CTA_SECONDARY}>
@@ -286,7 +317,9 @@ export default function Home() {
       {/* ================= “SOCIAL PROOF” ================= */}
       <section className="bg-white">
         <div className={`${CONTAINER} ${SECTION_Y}`}>
-          <h2 className="text-2xl font-semibold">Ce que les couples recherchent le plus</h2>
+          <h2 className="text-2xl font-semibold">
+            Ce que les couples recherchent le plus
+          </h2>
 
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {[
@@ -334,15 +367,34 @@ export default function Home() {
             <h2 className="text-2xl font-semibold">Prendre rendez-vous</h2>
 
             <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Envoyez 2–3 phrases sur votre situation. Je vous réponds rapidement pour fixer un rendez-vous.
+              Envoyez 2–3 phrases sur votre situation. Je vous réponds rapidement pour
+              fixer un rendez-vous.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
-              <a href={WHATSAPP_LINK} className={CTA_PRIMARY}>
+              <a
+                href={WHATSAPP_LINK}
+                className={CTA_PRIMARY}
+                onClick={() =>
+                  track("lead_whatsapp_click", {
+                    placement: "home_contact_primary",
+                    page: "home",
+                  })
+                }
+              >
                 Écrire sur WhatsApp (le plus rapide)
               </a>
 
-              <a href={PHONE_TEL} className={CTA_SECONDARY}>
+              <a
+                href={PHONE_TEL}
+                className={CTA_SECONDARY}
+                onClick={() =>
+                  track("lead_phone_click", {
+                    placement: "home_contact_phone",
+                    page: "home",
+                  })
+                }
+              >
                 Appeler
               </a>
 
@@ -350,13 +402,16 @@ export default function Home() {
                 Page contact
               </a>
             </div>
-<p className="mt-4 text-sm text-gray-700">
-  <span className="font-semibold">Présentiel :</span> Netanya •{" "}
-  <span className="font-semibold">Visio :</span> consultations en français, partout dans le monde
-</p>
+
+            <p className="mt-4 text-sm text-gray-700">
+              <span className="font-semibold">Présentiel :</span> Netanya •{" "}
+              <span className="font-semibold">Visio :</span> consultations en français,
+              partout dans le monde
+            </p>
 
             <p className="mt-5 text-xs text-gray-600">
-              Téléphone : <span className="font-semibold">+972 58 536 05 10</span> • Sans engagement • Confidentialité totale
+              Téléphone : <span className="font-semibold">+972 58 536 05 10</span> •
+              Sans engagement • Confidentialité totale
             </p>
           </div>
         </div>
