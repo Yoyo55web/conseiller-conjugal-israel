@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 function track(eventName: string, params?: Record<string, any>) {
@@ -9,6 +11,7 @@ function track(eventName: string, params?: Record<string, any>) {
     ...params,
   });
 }
+
 
 
 const WHATSAPP_LINK =
