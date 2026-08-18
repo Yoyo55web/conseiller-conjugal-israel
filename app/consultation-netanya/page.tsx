@@ -1,15 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { buildMetadata } from "../_seo/metadata";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20%C3%A0%20Netanya%20(en%20pr%C3%A9sentiel).%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous%20%C3%A0%20Netanya.";
 
 const PHONE_TEL = "tel:+972585360510";
 
-export const metadata = {
-  title: "Consultation de couple à Netanya – Présentiel | Conseiller Conjugal",
+export const metadata: Metadata = buildMetadata({
+  title: "Consultation de couple à Netanya",
   description:
     "Consultations de couple en présentiel à Netanya (discrétion, neutralité, cadre clair) et possibilité de visio en français.",
-};
+  pathname: "/consultation-netanya",
+});
 
 const CONTAINER = "max-w-4xl mx-auto px-6";
 const SECTION_Y = "py-16";
@@ -17,7 +20,7 @@ const CARD = "rounded-3xl border border-gray-200 bg-white p-8";
 const SOFT = "rounded-3xl border border-gray-200 bg-gray-50 p-8";
 
 const CTA_PRIMARY =
-  "inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-green-600 text-white px-6 py-3 text-sm font-semibold shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600/30";
+  "inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-green-700 text-white px-6 py-3 text-sm font-semibold shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30";
 const CTA_SECONDARY =
   "inline-flex w-full sm:w-auto items-center justify-center rounded-md border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900/10";
 
@@ -28,7 +31,7 @@ export default function ConsultationNetanyaPage() {
       <section className="bg-gray-50 border-b border-gray-200">
         <div className={`${CONTAINER} ${SECTION_Y}`}>
           <div className="flex flex-wrap gap-2">
-            {["Présentiel à Netanya", "Confidentialité totale", "Neutralité"].map((b) => (
+            {["Présentiel à Netanya", "Cadre confidentiel", "Neutralité"].map((b) => (
               <span
                 key={b}
                 className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-sm text-gray-700"
@@ -73,7 +76,7 @@ export default function ConsultationNetanyaPage() {
             <h2 className="text-2xl font-semibold">Ce que vous obtenez</h2>
 
             <ul className="mt-5 space-y-3 text-gray-800 leading-relaxed">
-              <li>• Une lecture claire de la situation (ce qui bloque réellement)</li>
+              <li>• Un premier éclairage sur les principaux blocages</li>
               <li>• Un cadre sécurisé : respect, neutralité, sans jugement</li>
               <li>• Des outils simples pour apaiser et mieux communiquer</li>
               <li>• Un objectif précis + un plan concret entre les séances</li>
@@ -153,7 +156,8 @@ export default function ConsultationNetanyaPage() {
           <div className="rounded-3xl border border-gray-200 bg-white p-8 text-center">
             <h2 className="text-2xl font-semibold">Commencer simplement</h2>
             <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Envoyez 2–3 phrases sur votre situation. Je vous réponds rapidement pour fixer un rendez-vous à Netanya.
+              Demandez simplement les prochaines disponibilités à Netanya. Il n’est pas
+              nécessaire de détailler votre situation sur WhatsApp.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">

@@ -1,31 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
-
-function track(eventName: string, params?: Record<string, any>) {
-  if (typeof window === "undefined") return;
-
-  const w = window as any;
-
-  // ✅ Priorité : GA4 direct
-  if (typeof w.gtag === "function") {
-    w.gtag("event", eventName, {
-      ...(params || {}),
-      transport_type: "beacon",
-    });
-    return;
-  }
-
-  // ✅ Fallback : dataLayer
-  w.dataLayer = w.dataLayer || [];
-  w.dataLayer.push({
-    event: eventName,
-    ...params,
-  });
-}
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -34,18 +13,28 @@ export default function SiteHeader() {
 
   // Bloque le scroll arrière-plan quand le menu mobile est ouvert
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
     document.body.style.overflow = open ? "hidden" : "";
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [open]);
 
   return (
     <header className="border-b bg-white/80 backdrop-blur sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="/" className="font-semibold tracking-tight whitespace-nowrap">
-          Conseiller Conjugal Israël
-        </a>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
+        <Link href="/" className="text-sm sm:text-base font-semibold tracking-tight whitespace-nowrap">
+          <span className="sm:hidden">Conseiller conjugal</span>
+          <span className="hidden sm:inline">Conseiller conjugal Israël</span>
+        </Link>
 
         {/* NAV desktop */}
         <nav className="hidden md:flex items-center justify-end space-x-4">
@@ -67,7 +56,7 @@ export default function SiteHeader() {
             href="/qui-sommes-nous"
             className="text-sm text-gray-700 hover:underline whitespace-nowrap"
           >
-            Qui sommes-nous
+            Qui suis-je
           </a>
 
           <a
@@ -80,12 +69,6 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
-            onClick={() =>
-              track("lead_whatsapp_click", {
-                placement: "header_desktop_prendre_rdv",
-                page: "global",
-              })
-            }
           >
             Prendre RDV
           </a>
@@ -96,12 +79,6 @@ export default function SiteHeader() {
           <a
             href={WHATSAPP_LINK}
             className="rounded-md bg-black text-white px-3 py-2 text-sm font-medium whitespace-nowrap"
-            onClick={() =>
-              track("lead_whatsapp_click", {
-                placement: "header_mobile_rdv",
-                page: "global",
-              })
-            }
           >
             RDV
           </a>
@@ -110,6 +87,8 @@ export default function SiteHeader() {
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
             className="rounded-md border px-3 py-2 text-sm font-medium bg-white"
           >
             {open ? "✕" : "☰"}
@@ -128,7 +107,11 @@ export default function SiteHeader() {
           />
 
           {/* Drawer */}
-          <div className="fixed top-[64px] left-0 right-0 z-50 bg-white border-b">
+          <nav
+            id="mobile-navigation"
+            aria-label="Navigation mobile"
+            className="fixed top-[64px] left-0 right-0 z-50 bg-white border-b"
+          >
             <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-3">
               <a
                 href="/tarifs"
@@ -151,7 +134,7 @@ export default function SiteHeader() {
                 onClick={close}
                 className="text-base text-gray-800 hover:underline"
               >
-                Qui sommes-nous
+                Qui suis-je
               </a>
 
               <a
@@ -164,19 +147,13 @@ export default function SiteHeader() {
 
               <a
                 href={WHATSAPP_LINK}
-                onClick={() => {
-                  track("lead_whatsapp_click", {
-                    placement: "header_mobile_drawer_whatsapp",
-                    page: "global",
-                  });
-                  close();
-                }}
-                className="mt-2 inline-flex items-center justify-center rounded-md bg-green-600 text-white px-4 py-3 text-sm font-medium"
+                onClick={close}
+                className="mt-2 inline-flex items-center justify-center rounded-md bg-green-700 text-white px-4 py-3 text-sm font-medium hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30"
               >
                 Écrire sur WhatsApp
               </a>
             </div>
-          </div>
+          </nav>
         </>
       )}
     </header>

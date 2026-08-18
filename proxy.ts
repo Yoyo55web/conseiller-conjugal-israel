@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isLocal =
+    request.nextUrl.hostname === "localhost" ||
+    request.nextUrl.hostname === "127.0.0.1";
 
   // 1) Forcer HTTPS + WWW (corrige pages en double + page avec redirection)
   if (
-    request.nextUrl.protocol === "http:" ||
+    (!isLocal && request.nextUrl.protocol === "http:") ||
     request.nextUrl.hostname === "conseiller-conjugal-israel.com"
   ) {
     const url = request.nextUrl.clone();

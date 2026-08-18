@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { buildMetadata } from "../_seo/metadata";
+
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous.%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
 
 const EMAIL = "conseiller.conjugal.israel@gmail.com";
 const TEL_IL_DISPLAY = "+972 58 536 05 10";
@@ -7,10 +11,16 @@ const TEL_IL = "+972585360510";
 const TEL_FR_DISPLAY = "+33 1 77 47 32 45";
 const TEL_FR = "+33177473245";
 
+export const metadata: Metadata = buildMetadata({
+  title: "Contact et prise de rendez-vous",
+  description:
+    "Contactez Yoni Berrebi pour une consultation conjugale en français, à Netanya ou en visioconférence. WhatsApp, téléphone et email.",
+  pathname: "/contact",
+});
+
 export default function ContactPage() {
   return (
     <main className="min-h-screen bg-white">
-
       {/* CONTENU */}
       <section className="max-w-6xl mx-auto px-6 py-14">
         <div className="max-w-3xl">
@@ -24,7 +34,7 @@ export default function ContactPage() {
           {/* Micro rassurance */}
           <div className="mt-6 flex flex-wrap gap-2">
             <span className="inline-flex items-center rounded-full border px-3 py-1 text-sm text-gray-700">
-              Confidentialité totale
+              Cadre confidentiel
             </span>
             <span className="inline-flex items-center rounded-full border px-3 py-1 text-sm text-gray-700">
               Réponse rapide
@@ -41,16 +51,17 @@ export default function ContactPage() {
           <div className="rounded-2xl border p-6 md:col-span-2">
             <h2 className="text-xl font-semibold">WhatsApp (recommandé)</h2>
             <p className="mt-2 text-gray-600">
-              Cliquez ci-dessous : le message est pré-rempli. Décrivez votre situation en 2–3 phrases.
+              Le message pré-rempli demande uniquement les prochaines disponibilités. Vous
+              n’avez pas besoin d’y détailler votre situation.
             </p>
 
             <div className="mt-5 flex flex-col sm:flex-row gap-3">
               <a
-  href={WHATSAPP_LINK}
-  className="inline-flex items-center justify-center rounded-md bg-green-600 text-white px-6 py-3 text-sm font-medium w-full sm:w-auto"
->
-  Écrire sur WhatsApp
-</a>
+                href={WHATSAPP_LINK}
+                className="inline-flex items-center justify-center rounded-md bg-green-700 text-white px-6 py-3 text-sm font-medium w-full sm:w-auto hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30"
+              >
+                Écrire sur WhatsApp
+              </a>
 
               <a
                 href={`tel:${TEL_IL}`}
@@ -100,9 +111,9 @@ export default function ContactPage() {
 
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {[
-              ["1) Décrivez", "Écrivez 2–3 phrases sur la situation."],
-              ["2) Précisez", "Visio ou présentiel + vos disponibilités."],
-              ["3) Rendez-vous", "On fixe un premier rendez-vous rapidement."],
+              ["1) Contactez", "Demandez les prochaines disponibilités."],
+              ["2) Précisez", "Indiquez visio ou présentiel, sans détail sensible."],
+              ["3) Confirmez", "Le tarif et le rendez-vous sont confirmés avec vous."],
             ].map(([t, d]) => (
               <div key={t} className="rounded-2xl border bg-gray-50 p-5">
                 <div className="font-semibold">{t}</div>
@@ -114,16 +125,15 @@ export default function ContactPage() {
           <div className="mt-6 text-sm text-gray-600">
             <span className="font-semibold">Durée :</span> 50–60 minutes •{" "}
             <span className="font-semibold">Format :</span> visio / présentiel •{" "}
-            <span className="font-semibold">Confidentialité :</span> totale
+            <span className="font-semibold">Confidentialité :</span> échanges traités
+            avec discrétion
           </div>
         </div>
 
-        <a href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
+        <Link href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
           ← Retour à l’accueil
-        </a>
+        </Link>
       </section>
-
-      
     </main>
   );
 }

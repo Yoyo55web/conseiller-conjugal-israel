@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import SiteHeader from "./_components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "Conseiller Conjugal Israël – Accompagnement couples et futurs mariés",
+  metadataBase: new URL("https://www.conseiller-conjugal-israel.com"),
+  title: {
+    default: "Conseiller conjugal en Israël – Netanya & visio",
+    template: "%s | Conseiller conjugal Israël",
+  },
   description:
     "Accompagnement conjugal professionnel : communication, conflits, confiance et préparation au mariage. Visio / présentiel. Public francophone en Israël.",
 };
-
-const GA_MEASUREMENT_ID = "G-8VTREB87B6";
 
 export default function RootLayout({
   children,
@@ -19,31 +20,16 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="bg-white text-black">
-        {/* ✅ Google Analytics GA4 — DOIT être dans body (App Router) */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="beforeInteractive"
-        />
-        <Script id="ga4-init" strategy="beforeInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            window.gtag = gtag;
-
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}', {
-              anonymize_ip: true,
-              send_page_view: true
-            });
-          `}
-        </Script>
-
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow focus:not-sr-only"
+        >
+          Aller au contenu principal
+        </a>
         <SiteHeader />
-
-        {/* CONTENU des pages */}
-        {children}
-
-        {/* FOOTER global */}
+        <div id="main-content" tabIndex={-1}>
+          {children}
+        </div>
         <footer className="border-t">
           <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between gap-4 text-sm text-gray-500">
             <div>© {new Date().getFullYear()} — Conseiller conjugal Israël</div>
@@ -56,7 +42,7 @@ export default function RootLayout({
                 Préparation au mariage
               </a>
               <a href="/qui-sommes-nous" className="hover:underline">
-                Qui sommes-nous
+                Qui suis-je
               </a>
               <a href="/mentions-legales" className="hover:underline">
                 Mentions légales
