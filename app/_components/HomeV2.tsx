@@ -1,44 +1,14 @@
-"use client";
-
 import Image from "next/image";
 
-/**
- * Tracking simple (GA4 si dispo, sinon dataLayer)
- */
-function track(eventName: string, params?: Record<string, any>) {
-  if (typeof window === "undefined") return;
-
-  const w = window as any;
-
-  // ✅ Priorité : GA4 direct
-  if (typeof w.gtag === "function") {
-    w.gtag("event", eventName, {
-      ...(params || {}),
-      transport_type: "beacon",
-    });
-    return;
-  }
-
-  // ✅ Fallback : dataLayer (ne bloque jamais)
-  w.dataLayer = w.dataLayer || [];
-  w.dataLayer.push({
-    event: eventName,
-    ...params,
-  });
-}
-
-/**
- * Liens
- */
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20faire%20le%20point%20sur%20ma%20situation.%20Voici%20en%202-3%20phrases%20ce%20que%20je%20vis%20%3A%20";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
 const PHONE_TEL = "tel:+972585360510";
 
 /**
- * ✅ CTA WhatsApp : vert WhatsApp-like (comme l’ancienne)
+ * CTA principal : vert foncé pour un contraste AA avec le texte blanc.
  */
 const CTA_PRIMARY =
-  "inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-[#16A34A] text-white px-7 py-3.5 text-sm font-semibold shadow-sm hover:bg-[#15803D] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30 transition";
+  "inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-green-700 text-white px-7 py-3.5 text-sm font-semibold shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30 transition";
 
 const CTA_SECONDARY =
   "inline-flex w-full sm:w-auto items-center justify-center rounded-md border border-gray-200 bg-white px-7 py-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900/10 transition";
@@ -51,12 +21,7 @@ const CONTAINER = "max-w-6xl mx-auto px-6";
 const CARD = "rounded-2xl border border-gray-200 bg-white p-6";
 const CARD_SOFT = "rounded-3xl border border-gray-200 bg-gray-50 p-8";
 
-/**
- * ✅ Titres (ancien + nouveau)
- * - H1 (ancien) = accroche / stop-scroll
- * - Phrase (nouveau) = rassurance, AVANT la méthode (pas dans “pour qui”)
- */
-const HERO_TITLE = "Vous souffrez en couple… mais en silence ?";
+const HERO_TITLE = "Retrouver le dialogue et avancer dans votre couple";
 
 export default function HomeV2() {
   return (
@@ -66,7 +31,7 @@ export default function HomeV2() {
         <div className="absolute inset-0">
           <Image
             src="/images/hero-abstract3.png"
-            alt="Fond apaisant"
+            alt=""
             fill
             priority
             className="object-cover"
@@ -83,7 +48,7 @@ export default function HomeV2() {
             <div className="space-y-7">
               <div className="flex flex-wrap gap-2">
                 {[
-                  "Confidentialité totale",
+                  "Cadre confidentiel",
                   "Neutralité",
                   "Présentiel à Netanya",
                   "Visio en français • Monde entier",
@@ -101,6 +66,10 @@ export default function HomeV2() {
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight text-balance">
                 {HERO_TITLE}
               </h1>
+
+              <p className="font-semibold text-gray-900">
+                Yoni Berrebi — conseiller conjugal francophone en Israël
+              </p>
 
               <p className="text-sm sm:text-base text-gray-800">
                 <span className="font-semibold">Présentiel :</span> Netanya •{" "}
@@ -138,9 +107,10 @@ export default function HomeV2() {
               </h2>
 
               <ul className="mt-5 space-y-3 text-gray-800">
-                <li>• Une lecture claire de la situation (ce qui bloque réellement)</li>
-                <li>• Des outils simples pour apaiser et mieux communiquer</li>
-                <li>• Un objectif précis + un plan concret entre les séances</li>
+                <li>• Un premier éclairage sur les principaux blocages</li>
+                <li>• Des priorités et un objectif clarifiés ensemble</li>
+                <li>• Une première action concrète à mettre en pratique</li>
+                <li>• Des pistes pour la suite, adaptées à votre situation</li>
                 <li>• Un cadre sécurisant, sans jugement et sans prise de parti</li>
               </ul>
 
@@ -149,12 +119,6 @@ export default function HomeV2() {
                   href={WHATSAPP_LINK}
                   aria-label="En parler en toute confidentialité sur WhatsApp"
                   className={CTA_PRIMARY}
-                  onClick={() =>
-                    track("lead_whatsapp_click", {
-                      placement: "v2_hero_primary",
-                      page: "v2",
-                    })
-                  }
                 >
                   En parler en toute confidentialité
                 </a>
@@ -171,12 +135,6 @@ export default function HomeV2() {
                   href={PHONE_TEL}
                   aria-label="Appeler"
                   className={CTA_SECONDARY}
-                  onClick={() =>
-                    track("lead_phone_click", {
-                      placement: "v2_hero_phone",
-                      page: "v2",
-                    })
-                  }
                 >
                   Appeler
                 </a>
@@ -231,12 +189,6 @@ export default function HomeV2() {
             <a
               href={WHATSAPP_LINK}
               className={CTA_PRIMARY}
-              onClick={() =>
-                track("lead_whatsapp_click", {
-                  placement: "v2_for_who_primary",
-                  page: "v2",
-                })
-              }
             >
               Écrire sur WhatsApp
             </a>
@@ -286,8 +238,8 @@ export default function HomeV2() {
                   Vous voulez commencer simplement ?
                 </div>
                 <p className="mt-2 text-gray-700 leading-relaxed max-w-xl">
-                  Envoyez 2–3 phrases sur votre situation. Je vous réponds rapidement
-                  pour fixer un rendez-vous.
+                  Demandez simplement les prochaines disponibilités. Les détails sensibles
+                  pourront être abordés dans un cadre adapté.
                 </p>
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -295,12 +247,6 @@ export default function HomeV2() {
                     href={WHATSAPP_LINK}
                     aria-label="Écrire sur WhatsApp"
                     className={CTA_PRIMARY}
-                    onClick={() =>
-                      track("lead_whatsapp_click", {
-                        placement: "v2_method_primary",
-                        page: "v2",
-                      })
-                    }
                   >
                     Écrire sur WhatsApp
                   </a>
@@ -326,8 +272,8 @@ export default function HomeV2() {
           <div className="mt-10 grid gap-4 md:grid-cols-2">
             {[
               [
-                "Confidentialité totale",
-                "Un espace sûr pour parler librement, sans jugement.",
+                "Confidentialité et discrétion",
+                "Des échanges traités avec discrétion, dans les limites prévues par la loi et la sécurité des personnes.",
               ],
               [
                 "Neutralité",
@@ -402,7 +348,10 @@ export default function HomeV2() {
 
           <div className="mt-10 grid gap-4 md:grid-cols-2">
             {[
-              ["Est-ce confidentiel ?", "Oui, totalement. Les échanges restent privés."],
+              [
+                "Est-ce confidentiel ?",
+                "Les échanges sont traités avec discrétion et confidentialité, dans les limites prévues par la loi et la sécurité des personnes.",
+              ],
               ["Combien de séances ?", "Souvent 4 à 8 selon la situation, parfois moins."],
               [
                 "Où ont lieu les consultations ?",
@@ -411,6 +360,10 @@ export default function HomeV2() {
               [
                 "Peut-on commencer seul ?",
                 "Oui. On peut démarrer même si l’autre ne souhaite pas encore venir.",
+              ],
+              [
+                "Cet accompagnement remplace-t-il un soin ou une urgence ?",
+                "Non. Il ne remplace pas un suivi médical, psychologique ou juridique. En cas de danger immédiat, contactez les services d’urgence de votre pays.",
               ],
             ].map(([q, a]) => (
               <div key={q} className="rounded-2xl border border-gray-200 bg-white p-6">
@@ -429,8 +382,8 @@ export default function HomeV2() {
             <h2 className="text-2xl font-semibold">Prendre rendez-vous</h2>
 
             <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Envoyez 2–3 phrases sur votre situation. Je vous réponds rapidement pour
-              fixer un rendez-vous.
+              Demandez les prochaines disponibilités sur WhatsApp. Il n’est pas nécessaire
+              d’y détailler votre situation.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
@@ -438,12 +391,6 @@ export default function HomeV2() {
                 href={WHATSAPP_LINK}
                 aria-label="Écrire sur WhatsApp (le plus rapide)"
                 className={CTA_PRIMARY}
-                onClick={() =>
-                  track("lead_whatsapp_click", {
-                    placement: "v2_contact_primary",
-                    page: "v2",
-                  })
-                }
               >
                 Écrire sur WhatsApp (le plus rapide)
               </a>
@@ -452,12 +399,6 @@ export default function HomeV2() {
                 href={PHONE_TEL}
                 aria-label="Appeler"
                 className={CTA_SECONDARY}
-                onClick={() =>
-                  track("lead_phone_click", {
-                    placement: "v2_contact_phone",
-                    page: "v2",
-                  })
-                }
               >
                 Appeler
               </a>
@@ -475,7 +416,7 @@ export default function HomeV2() {
 
             <p className="mt-5 text-xs text-gray-600">
               Téléphone : <span className="font-semibold">+972 58 536 05 10</span> •
-              Sans engagement • Confidentialité totale
+              Sans engagement • Échanges traités avec discrétion
             </p>
           </div>
         </div>

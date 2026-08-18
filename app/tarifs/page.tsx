@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { buildMetadata } from "../_seo/metadata";
+
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20les%20tarifs%20et%20les%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.%20Voici%20ma%20situation%20en%202-3%20phrases%20%3A%20";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20les%20tarifs%20et%20les%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
 
 const PHONE_TEL = "tel:+972585360510";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Tarifs des consultations de couple",
+  description:
+    "Formats proposés pour les séances de couple, individuelles et la préparation au mariage, en visio ou à Netanya. Tarif communiqué avant confirmation.",
+  pathname: "/tarifs",
+});
 
 export default function TarifsPage() {
   return (
@@ -11,20 +22,32 @@ export default function TarifsPage() {
         <h1 className="text-4xl font-bold tracking-tight">Tarifs</h1>
 
         <p className="mt-4 text-lg text-gray-600 max-w-3xl">
-  Les tarifs dépendent du <strong>type d’accompagnement</strong> (couple / individuel / préparation au mariage)
-  et du <strong>format</strong> (visio ou présentiel).
-  <br />
-  Pour être transparent et <strong>éviter toute mauvaise surprise</strong>, je vous communique rapidement
-  un <strong>tarif clair</strong> adapté à votre demande, <strong>avant toute confirmation</strong>.
-</p>
-
+          Les tarifs dépendent du <strong>type d’accompagnement</strong> (couple,
+          individuel ou préparation au mariage) et du <strong>format</strong> (visio ou
+          présentiel).
+          <br />
+          Pour éviter toute mauvaise surprise, le montant adapté à votre demande vous est
+          communiqué <strong>par écrit avant toute confirmation</strong>.
+        </p>
 
         {/* Cartes offres */}
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
-            ["Séance couple", "50–60 minutes", "Visio ou présentiel • Outils concrets • Cadre structuré"],
-            ["Séance individuelle", "50–60 minutes", "Clarification • Outils concrets • Plan d’action"],
-            ["Préparation au mariage", "Programme", "Bases solides • Transmission structurée • Suivi possible"],
+            [
+              "Séance couple",
+              "50–60 minutes • Tarif avant confirmation",
+              "Visio ou présentiel • Outils concrets • Cadre structuré",
+            ],
+            [
+              "Séance individuelle",
+              "50–60 minutes • Tarif avant confirmation",
+              "Clarification • Outils concrets • Plan d’action",
+            ],
+            [
+              "Préparation au mariage",
+              "Programme • Tarif avant confirmation",
+              "Bases solides • Transmission structurée • Suivi possible",
+            ],
           ].map(([title, line1, line2]) => (
             <div key={title} className="rounded-2xl border p-6">
               <div className="font-semibold">{title}</div>
@@ -39,18 +62,18 @@ export default function TarifsPage() {
           <h2 className="text-xl font-semibold">Demander les tarifs (réponse rapide)</h2>
 
           <p className="mt-2 text-gray-600 max-w-3xl">
-  Envoyez un message sur <strong>WhatsApp</strong> avec :
-  <strong> 1)</strong> couple, individuel ou préparation au mariage,
-  <strong> 2)</strong> visio ou présentiel,
-  <strong> 3)</strong> <strong>2–3 phrases</strong> sur la situation.
-  <br />
-  Je vous réponds rapidement avec le <strong>tarif</strong> et les <strong>prochaines disponibilités</strong>.
-</p>
+            Envoyez un message sur <strong>WhatsApp</strong> en précisant simplement :
+            <strong> 1)</strong> couple, individuel ou préparation au mariage et
+            <strong> 2)</strong> visio ou présentiel.
+            <br />
+            Je vous réponds avec le <strong>tarif</strong> et les{" "}
+            <strong>prochaines disponibilités</strong>.
+          </p>
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3">
             <a
               href={WHATSAPP_LINK}
-              className="inline-flex items-center justify-center rounded-md bg-green-600 text-white px-6 py-3 text-sm font-medium"
+              className="inline-flex items-center justify-center rounded-md bg-green-700 text-white px-6 py-3 text-sm font-medium hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30"
             >
               Contacter sur WhatsApp
             </a>
@@ -71,7 +94,7 @@ export default function TarifsPage() {
           </div>
 
           <p className="mt-3 text-xs text-gray-500">
-            Confidentialité totale • Sans engagement • Réponse rapide
+            Échanges traités avec discrétion • Sans engagement • Réponse rapide
           </p>
         </div>
 
@@ -80,7 +103,7 @@ export default function TarifsPage() {
           {[
             [
               "Pourquoi les tarifs sont “sur demande” ?",
-              "Parce que le format (visio/présentiel) et le type d’accompagnement influencent le tarif. Vous recevez un tarif clair et transparent avant de confirmer.",
+              "Le format (visio ou présentiel) et le type d’accompagnement influencent le tarif. Le montant vous est communiqué par écrit avant toute confirmation.",
             ],
             [
               "Puis-je commencer seul(e) ?",
@@ -102,9 +125,9 @@ export default function TarifsPage() {
           ))}
         </div>
 
-        <a href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
+        <Link href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
           ← Retour à l’accueil
-        </a>
+        </Link>
       </section>
     </main>
   );

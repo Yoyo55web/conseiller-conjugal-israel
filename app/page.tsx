@@ -9,6 +9,27 @@ export const metadata: Metadata = buildMetadata({
   pathname: "/",
 });
 
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Yoni Berrebi",
+  jobTitle: "Conseiller conjugal",
+  url: "https://www.conseiller-conjugal-israel.com/qui-sommes-nous",
+  telephone: "+972585360510",
+  email: "conseiller.conjugal.israel@gmail.com",
+  knowsLanguage: ["fr"],
+};
+
 export default function Page() {
-  return <HomeV2 />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <HomeV2 />
+    </>
+  );
 }

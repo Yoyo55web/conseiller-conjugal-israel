@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { buildMetadata } from "../_seo/metadata";
+
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20la%20pr%C3%A9paration%20au%20mariage%20et%20prendre%20rendez-vous.%20Voici%20notre%20situation%20en%202-3%20phrases%20%3A%20";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20la%20pr%C3%A9paration%20au%20mariage%20et%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s.";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Préparation au mariage en français",
+  description:
+    "Préparation au mariage structurée en français : communication, attentes, vie conjugale et pureté familiale. À Netanya ou en visioconférence.",
+  pathname: "/preparation-au-mariage",
+});
 
 export default function PreparationAuMariagePage() {
   return (
@@ -12,9 +24,12 @@ export default function PreparationAuMariagePage() {
 
         {/* IMAGE SYMBOLIQUE */}
         <div className="mt-8 mb-12 flex justify-center">
-          <img
+          <Image
             src="/images/preparation-mariage.png"
             alt="Préparation au mariage – réflexion et construction des bases du couple"
+            width={1536}
+            height={1024}
+            sizes="(min-width: 768px) 768px, calc(100vw - 3rem)"
             className="w-full max-w-3xl rounded-2xl object-cover"
           />
         </div>
@@ -82,7 +97,7 @@ export default function PreparationAuMariagePage() {
           {/* CTA */}
           <a
             href={WHATSAPP_LINK}
-            className="inline-block mt-8 rounded-md bg-green-600 text-white px-6 py-3 text-sm font-medium"
+            className="inline-block mt-8 rounded-md bg-green-700 text-white px-6 py-3 text-sm font-medium hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700/30"
           >
             Écrire sur WhatsApp – préparation au mariage
           </a>
@@ -92,9 +107,9 @@ export default function PreparationAuMariagePage() {
           </p>
         </div>
 
-        <a href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
+        <Link href="/" className="inline-block mt-10 text-sm text-gray-600 underline">
           ← Retour à l’accueil
-        </a>
+        </Link>
       </section>
     </main>
   );
