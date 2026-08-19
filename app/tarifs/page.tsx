@@ -10,7 +10,7 @@ const PHONE_TEL = "tel:+972585360510";
 export const metadata: Metadata = buildMetadata({
   title: "Tarifs des consultations de couple",
   description:
-    "Formats proposés pour les séances de couple, individuelles et la préparation au mariage, en visio ou à Netanya. Tarif communiqué avant confirmation.",
+    "Tarifs des séances de couple et individuelles, à Netanya ou en visioconférence, ainsi que de la préparation au mariage personnalisée.",
   pathname: "/tarifs",
 });
 
@@ -22,52 +22,65 @@ export default function TarifsPage() {
         <h1 className="text-4xl font-bold tracking-tight">Tarifs</h1>
 
         <p className="mt-4 text-lg text-gray-600 max-w-3xl">
-          Les tarifs dépendent du <strong>type d’accompagnement</strong> (couple,
-          individuel ou préparation au mariage) et du <strong>format</strong> (visio ou
-          présentiel).
-          <br />
-          Pour éviter toute mauvaise surprise, le montant adapté à votre demande vous est
-          communiqué <strong>par écrit avant toute confirmation</strong>.
+          Des tarifs clairs pour les séances de couple et individuelles. La préparation au
+          mariage est personnalisée selon vos connaissances, vos besoins et votre rythme.
         </p>
 
         {/* Cartes offres */}
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
             [
-              "Séance couple",
-              "50–60 minutes • Tarif avant confirmation",
-              "Visio ou présentiel • Outils concrets • Cadre structuré",
+              "Séance de couple",
+              "250 ₪ ou 75 €",
+              "50–60 minutes • Netanya ou visioconférence",
             ],
             [
               "Séance individuelle",
-              "50–60 minutes • Tarif avant confirmation",
-              "Clarification • Outils concrets • Plan d’action",
+              "250 ₪ ou 75 €",
+              "50–60 minutes • En visioconférence",
             ],
             [
               "Préparation au mariage",
-              "Programme • Tarif avant confirmation",
-              "Bases solides • Transmission structurée • Suivi possible",
+              "À partir de 2 000 ₪",
+              "Programme personnalisé • Tarif défini avant de commencer",
             ],
           ].map(([title, line1, line2]) => (
             <div key={title} className="rounded-2xl border p-6">
               <div className="font-semibold">{title}</div>
-              <div className="mt-2 text-gray-600">{line1}</div>
-              <div className="text-gray-600">{line2}</div>
+              <div className="mt-3 text-2xl font-bold text-gray-900">{line1}</div>
+              <div className="mt-2 text-sm text-gray-600">{line2}</div>
             </div>
           ))}
         </div>
 
-        {/* Bloc conversion */}
+        <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-semibold">Une préparation adaptée à chaque futur marié</h2>
+          <p className="mt-2 text-gray-600 leading-relaxed max-w-4xl">
+            Le parcours complet comprend généralement <strong>15 à 20 séances</strong>.
+            Selon les connaissances déjà acquises, les besoins et le temps disponible, un
+            format accéléré d’environ <strong>10 séances</strong>, ou parfois moins, peut
+            être proposé. Le nombre de séances et le tarif total sont convenus avant le
+            début du programme.
+          </p>
+        </div>
+
+        <p className="mt-4 text-sm text-gray-500">
+          Les séances peuvent être réglées en shekels ou en euros. Pour la préparation au
+          mariage, l’équivalent en euros est précisé avec la proposition personnalisée.
+        </p>
+
+        {/* Bloc rendez-vous */}
         <div className="mt-10 rounded-3xl border bg-gray-50 p-8">
-          <h2 className="text-xl font-semibold">Demander les tarifs (réponse rapide)</h2>
+          <h2 className="text-xl font-semibold">Prendre rendez-vous</h2>
 
           <p className="mt-2 text-gray-600 max-w-3xl">
             Envoyez un message sur <strong>WhatsApp</strong> en précisant simplement :
             <strong> 1)</strong> couple, individuel ou préparation au mariage et
             <strong> 2)</strong> visio ou présentiel.
             <br />
-            Je vous réponds avec le <strong>tarif</strong> et les{" "}
-            <strong>prochaines disponibilités</strong>.
+            Je vous réponds avec les <strong>prochaines disponibilités</strong>. Pour la
+            préparation au mariage, le format et le tarif total sont précisés avant de
+            commencer.
           </p>
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3">
@@ -102,16 +115,16 @@ export default function TarifsPage() {
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {[
             [
-              "Pourquoi les tarifs sont “sur demande” ?",
-              "Le format (visio ou présentiel) et le type d’accompagnement influencent le tarif. Le montant vous est communiqué par écrit avant toute confirmation.",
+              "La visioconférence est-elle moins chère ?",
+              "Non. Une séance en visioconférence demande le même temps, la même attention et la même préparation. Le tarif reste donc identique.",
             ],
             [
-              "Puis-je commencer seul(e) ?",
-              "Oui, c’est possible. Cela permet souvent de clarifier la situation et de préparer une démarche à deux.",
+              "Une séance individuelle a-t-elle le même tarif ?",
+              "Oui. Une séance individuelle dure également 50 à 60 minutes et bénéficie du même cadre d’accompagnement.",
             ],
             [
-              "En combien de temps avez-vous une réponse ?",
-              "Généralement rapidement, surtout sur WhatsApp.",
+              "Combien de séances comprend la préparation au mariage ?",
+              "Le parcours complet comprend généralement 15 à 20 séances. Un format accéléré d’environ 10 séances, ou parfois moins, peut être proposé selon les besoins.",
             ],
             [
               "Où ont lieu les séances ?",

@@ -110,7 +110,7 @@ export default function HomeV2() {
                 <li>• Comprendre plus clairement ce qui alimente les tensions</li>
                 <li>• Identifier ensemble le point essentiel à clarifier</li>
                 <li>• Retrouver un échange plus posé et structuré</li>
-                <li>• Repartir avec une première piste concrète à essayer</li>
+                <li>• Repartir avec des pistes concrètes</li>
                 <li>• Définir un cap adapté pour la suite</li>
               </ul>
 
