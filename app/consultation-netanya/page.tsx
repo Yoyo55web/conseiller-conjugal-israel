@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buildMetadata } from "../_seo/metadata";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous%20%C3%A0%20Netanya.";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal%20en%20pr%C3%A9sentiel%20%C3%A0%20Netanya.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 
 const PHONE_TEL = "tel:+972585360510";
 
@@ -156,8 +156,8 @@ export default function ConsultationNetanyaPage() {
           <div className="rounded-3xl border border-gray-200 bg-white p-8 text-center">
             <h2 className="text-2xl font-semibold">Commencer simplement</h2>
             <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Demandez simplement les prochaines disponibilités à Netanya. Il n’est pas
-              nécessaire de détailler votre situation sur WhatsApp.
+              Demandez simplement les prochaines disponibilités et le tarif à Netanya. Il
+              n’est pas nécessaire de détailler votre situation sur WhatsApp.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">

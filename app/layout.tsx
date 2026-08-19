@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AnalyticsConsent from "./_components/AnalyticsConsent";
 import SiteHeader from "./_components/SiteHeader";
 
 export const metadata: Metadata = {
@@ -53,6 +54,7 @@ export default function RootLayout({
               <a href="/contact" className="hover:underline">
                 Contact
               </a>
+              <AnalyticsConsent />
             </div>
           </div>
         </footer>

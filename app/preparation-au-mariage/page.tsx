@@ -4,7 +4,7 @@ import Link from "next/link";
 import { buildMetadata } from "../_seo/metadata";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20la%20pr%C3%A9paration%20au%20mariage%20et%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s.";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20la%20pr%C3%A9paration%20au%20mariage.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 
 export const metadata: Metadata = buildMetadata({
   title: "Préparation au mariage en français",
