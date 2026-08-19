@@ -115,14 +115,6 @@ export default function TarifsPage() {
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {[
             [
-              "La visioconférence est-elle moins chère ?",
-              "Non. Une séance en visioconférence demande le même temps, la même attention et la même préparation. Le tarif reste donc identique.",
-            ],
-            [
-              "Une séance individuelle a-t-elle le même tarif ?",
-              "Oui. Une séance individuelle dure également 50 à 60 minutes et bénéficie du même cadre d’accompagnement.",
-            ],
-            [
               "Combien de séances comprend la préparation au mariage ?",
               "Le parcours complet comprend généralement 15 à 20 séances. Un format accéléré d’environ 10 séances, ou parfois moins, peut être proposé selon les besoins.",
             ],
