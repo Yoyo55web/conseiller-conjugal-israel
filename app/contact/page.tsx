@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buildMetadata } from "../_seo/metadata";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 
 const EMAIL = "conseiller.conjugal.israel@gmail.com";
 const TEL_IL_DISPLAY = "+972 58 536 05 10";
@@ -51,7 +51,7 @@ export default function ContactPage() {
           <div className="rounded-2xl border p-6 md:col-span-2">
             <h2 className="text-xl font-semibold">WhatsApp (recommandé)</h2>
             <p className="mt-2 text-gray-600">
-              Le message pré-rempli demande uniquement les prochaines disponibilités. Vous
+              Le message pré-rempli demande les prochaines disponibilités et le tarif. Vous
               n’avez pas besoin d’y détailler votre situation.
             </p>
 
@@ -111,7 +111,7 @@ export default function ContactPage() {
 
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {[
-              ["1) Contactez", "Demandez les prochaines disponibilités."],
+              ["1) Contactez", "Demandez les prochaines disponibilités et le tarif."],
               ["2) Précisez", "Indiquez visio ou présentiel, sans détail sensible."],
               ["3) Confirmez", "Le tarif et le rendez-vous sont confirmés avec vous."],
             ].map(([t, d]) => (

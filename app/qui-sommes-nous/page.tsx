@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buildMetadata } from "../_seo/metadata";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 
 export const metadata: Metadata = buildMetadata({
   title: "Yoni Berrebi, conseiller conjugal",
@@ -68,19 +68,13 @@ export default function QuiSuisJePage() {
           ))}
         </div>
 
-        <aside className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-950">
-          Cet accompagnement ne remplace pas un suivi médical, psychologique ou juridique
-          et n’est pas un service d’urgence. En cas de danger immédiat, contactez les
-          services d’urgence de votre pays.
-        </aside>
-
         <div className="mt-16 rounded-3xl border border-gray-200 bg-gray-50 p-8 sm:p-10 text-center">
           <h2 className="text-xl font-semibold">
             Vous souhaitez faire le point sur votre situation ?
           </h2>
           <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-            Demandez simplement les prochaines disponibilités. Il n’est pas nécessaire
-            de détailler votre situation sur WhatsApp.
+            Demandez simplement les prochaines disponibilités et le tarif. Il n’est pas
+            nécessaire de détailler votre situation sur WhatsApp.
           </p>
           <a
             href={WHATSAPP_LINK}

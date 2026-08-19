@@ -46,12 +46,10 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Responsabilité et urgence</h2>
+        <h2 className="text-xl font-semibold">Responsabilité</h2>
         <p className="text-gray-700 leading-relaxed">
-          Les contenus sont fournis à titre informatif. L’accompagnement proposé ne remplace
-          pas un avis ni un suivi médical, psychologique ou juridique et ne constitue pas un
-          service d’urgence. En cas de danger immédiat, contactez les services d’urgence de
-          votre pays.
+          Les contenus de ce site présentent l’accompagnement proposé et ne constituent pas
+          une promesse de résultat.
         </p>
       </section>
 

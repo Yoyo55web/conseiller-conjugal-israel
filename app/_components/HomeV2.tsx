@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const WHATSAPP_LINK =
-  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20conna%C3%AEtre%20vos%20prochaines%20disponibilit%C3%A9s%20pour%20un%20rendez-vous.";
+  "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 const PHONE_TEL = "tel:+972585360510";
 
 /**
@@ -21,7 +21,7 @@ const CONTAINER = "max-w-6xl mx-auto px-6";
 const CARD = "rounded-2xl border border-gray-200 bg-white p-6";
 const CARD_SOFT = "rounded-3xl border border-gray-200 bg-gray-50 p-8";
 
-const HERO_TITLE = "Retrouver le dialogue et avancer dans votre couple";
+const HERO_TITLE = "Vous souffrez en couple… mais en silence ?";
 
 export default function HomeV2() {
   return (
@@ -68,7 +68,7 @@ export default function HomeV2() {
               </h1>
 
               <p className="font-semibold text-gray-900">
-                Yoni Berrebi — conseiller conjugal francophone en Israël
+                Conseil conjugal francophone en Israël
               </p>
 
               <p className="text-sm sm:text-base text-gray-800">
@@ -103,15 +103,15 @@ export default function HomeV2() {
             {/* Colonne DROITE = actions */}
             <div className="rounded-3xl border border-gray-200 bg-white/85 backdrop-blur p-10 shadow-sm">
               <h2 className="text-xl font-semibold">
-                Ce que vous obtenez dès la première séance
+                Dès la première séance, vous commencez à y voir plus clair
               </h2>
 
               <ul className="mt-5 space-y-3 text-gray-800">
-                <li>• Un premier éclairage sur les principaux blocages</li>
-                <li>• Des priorités et un objectif clarifiés ensemble</li>
-                <li>• Une première action concrète à mettre en pratique</li>
-                <li>• Des pistes pour la suite, adaptées à votre situation</li>
-                <li>• Un cadre sécurisant, sans jugement et sans prise de parti</li>
+                <li>• Comprendre plus clairement ce qui alimente les tensions</li>
+                <li>• Identifier ensemble le point essentiel à clarifier</li>
+                <li>• Retrouver un échange plus posé et structuré</li>
+                <li>• Repartir avec une première piste concrète à essayer</li>
+                <li>• Définir un cap adapté pour la suite</li>
               </ul>
 
               <div className="mt-7 flex flex-col gap-3">
@@ -238,8 +238,8 @@ export default function HomeV2() {
                   Vous voulez commencer simplement ?
                 </div>
                 <p className="mt-2 text-gray-700 leading-relaxed max-w-xl">
-                  Demandez simplement les prochaines disponibilités. Les détails sensibles
-                  pourront être abordés dans un cadre adapté.
+                  Demandez simplement les prochaines disponibilités et le tarif. Les détails
+                  sensibles pourront être abordés dans un cadre adapté.
                 </p>
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -361,10 +361,6 @@ export default function HomeV2() {
                 "Peut-on commencer seul ?",
                 "Oui. On peut démarrer même si l’autre ne souhaite pas encore venir.",
               ],
-              [
-                "Cet accompagnement remplace-t-il un soin ou une urgence ?",
-                "Non. Il ne remplace pas un suivi médical, psychologique ou juridique. En cas de danger immédiat, contactez les services d’urgence de votre pays.",
-              ],
             ].map(([q, a]) => (
               <div key={q} className="rounded-2xl border border-gray-200 bg-white p-6">
                 <div className="font-semibold">{q}</div>
@@ -382,8 +378,8 @@ export default function HomeV2() {
             <h2 className="text-2xl font-semibold">Prendre rendez-vous</h2>
 
             <p className="mt-3 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Demandez les prochaines disponibilités sur WhatsApp. Il n’est pas nécessaire
-              d’y détailler votre situation.
+              Demandez les prochaines disponibilités et le tarif sur WhatsApp. Il n’est pas
+              nécessaire d’y détailler votre situation.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">

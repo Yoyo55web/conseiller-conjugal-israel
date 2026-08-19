@@ -18,7 +18,6 @@ export default function ConfidentialitePage() {
         <h1 className="text-4xl font-bold tracking-tight">
           Politique de confidentialité
         </h1>
-        <p className="mt-3 text-sm text-gray-500">Dernière mise à jour : 18 août 2026</p>
       </div>
 
       <p className="text-gray-700 leading-relaxed">
@@ -49,8 +48,9 @@ export default function ConfidentialitePage() {
           Le site est hébergé par Vercel, qui peut traiter des données techniques et des
           journaux nécessaires à la sécurité et au fonctionnement. Si vous choisissez un
           bouton de contact, WhatsApp (Meta) ou Gmail (Google) traite alors les données
-          selon ses propres conditions. Ces services peuvent impliquer un traitement hors
-          de votre pays de résidence.
+          selon ses propres conditions. Si vous acceptez la mesure d’audience, Google traite
+          également les données nécessaires au fonctionnement de Google Analytics. Ces
+          services peuvent impliquer un traitement hors de votre pays de résidence.
         </p>
         <p className="text-gray-700 leading-relaxed">
           Aucune donnée n’est vendue. Elle n’est communiquée qu’aux prestataires nécessaires
@@ -61,9 +61,17 @@ export default function ConfidentialitePage() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Cookies et mesure d’audience</h2>
         <p className="text-gray-700 leading-relaxed">
-          Le site ne charge actuellement aucun outil publicitaire ni outil de mesure
-          d’audience non essentiel. L’hébergeur peut néanmoins utiliser des mécanismes
-          strictement techniques pour la sécurité et la fourniture du site.
+          Google Analytics est utilisé uniquement si vous l’acceptez dans le bandeau de
+          consentement. Il permet de mesurer les pages consultées, les interactions avec les
+          moyens de contact et des informations techniques générales afin d’améliorer le
+          contenu du site. Google peut alors déposer ou lire des cookies de mesure d’audience
+          et traiter les données selon ses propres conditions.
+        </p>
+        <p className="text-gray-700 leading-relaxed">
+          Si vous refusez, Google Analytics n’est pas chargé. Vous pouvez modifier ou retirer
+          votre consentement à tout moment depuis le lien « Gérer mes cookies » présent dans
+          le pied de page. Les mécanismes strictement nécessaires à la sécurité, au
+          fonctionnement du site et à la mémorisation de votre choix restent disponibles.
         </p>
       </section>
 
