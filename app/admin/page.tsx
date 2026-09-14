@@ -125,7 +125,9 @@ export default async function AdminPage({
                       <p><strong>Enfants :</strong> {dossier.intake.children || "Non renseigné"}</p>
                       <p><strong>Accompagnement antérieur :</strong> {dossier.intake.previousSupport || "Non renseigné"}</p>
                       <p><strong>Cadre accepté :</strong> {dossier.intake.husbandSignature} et {dossier.intake.wifeSignature}</p>
-                      <p><strong>Sécurité de parole :</strong> époux {dossier.intake.husbandSafe}, épouse {dossier.intake.wifeSafe}</p>
+                      {dossier.intake.husbandSafe || dossier.intake.wifeSafe ? (
+                        <p><strong>Sécurité de parole :</strong> époux {dossier.intake.husbandSafe}, épouse {dossier.intake.wifeSafe}</p>
+                      ) : null}
                     </div>
                   </details>
                 ) : null}

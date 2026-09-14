@@ -21,7 +21,7 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
         <p className="text-sm font-semibold text-green-800">Lien personnel et confidentiel</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Préparer votre premier rendez-vous</h1>
         <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">
-          Ce formulaire permet de transmettre les informations utiles avant votre premier rendez-vous.
+          Ce formulaire permet de consacrer davantage de temps à votre situation pendant la séance.
         </p>
         {dossier.appointmentAt ? (
           <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-5 text-sm text-green-950">
