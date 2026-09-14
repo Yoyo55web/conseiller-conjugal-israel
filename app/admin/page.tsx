@@ -120,8 +120,8 @@ export default async function AdminPage({
                     <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
                       <p><strong>Époux :</strong> {dossier.intake.husbandFirstName} {dossier.intake.husbandLastName} · {dossier.intake.husbandEmail} · {dossier.intake.husbandPhone}</p>
                       <p><strong>Épouse :</strong> {dossier.intake.wifeFirstName} {dossier.intake.wifeLastName} · {dossier.intake.wifeEmail} · {dossier.intake.wifePhone}</p>
-                      <p><strong>Motif :</strong> {dossier.intake.mainReason}</p>
-                      <p><strong>Priorité :</strong> {dossier.intake.priority}</p>
+                      {dossier.intake.mainReason ? <p><strong>Motif :</strong> {dossier.intake.mainReason}</p> : null}
+                      {dossier.intake.priority ? <p><strong>Priorité :</strong> {dossier.intake.priority}</p> : null}
                       <p><strong>Enfants :</strong> {dossier.intake.children || "Non renseigné"}</p>
                       <p><strong>Accompagnement antérieur :</strong> {dossier.intake.previousSupport || "Non renseigné"}</p>
                       <p><strong>Cadre accepté :</strong> {dossier.intake.husbandSignature} et {dossier.intake.wifeSignature}</p>

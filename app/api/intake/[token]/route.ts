@@ -3,7 +3,7 @@ import { saveIntake, type IntakeData } from "@/lib/db";
 const requiredText = [
   "husbandFirstName", "husbandLastName", "husbandAge", "husbandEmail", "husbandPhone",
   "wifeFirstName", "wifeLastName", "wifeAge", "wifeEmail", "wifePhone", "country",
-  "mainReason", "difficultySince", "priority", "husbandSafe", "wifeSafe",
+  "husbandSafe", "wifeSafe",
   "husbandSignature", "wifeSignature",
 ] as const;
 
@@ -50,7 +50,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
       previousSupport: text(body.previousSupport, 800), mainReason: text(body.mainReason), difficultySince: text(body.difficultySince, 300),
       priority: text(body.priority, 500), husbandSafe: text(body.husbandSafe, 30), wifeSafe: text(body.wifeSafe, 30),
       husbandAccepted: true, wifeAccepted: true, husbandSignature: text(body.husbandSignature, 200), wifeSignature: text(body.wifeSignature, 200),
-      privacyAccepted: true, acceptedAt: new Date().toISOString(), frameworkVersion: "2026-09-14-v1",
+      privacyAccepted: true, acceptedAt: new Date().toISOString(), frameworkVersion: "2026-09-14-v2",
     };
     const saved = await saveIntake(token, data);
     if (!saved) return Response.json({ error: "Ce lien n’est plus valide." }, { status: 404 });
