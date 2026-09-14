@@ -116,8 +116,10 @@ export default function HomeV2() {
               </ul>
 
               <p className="mt-5 text-sm leading-relaxed text-gray-700">
-                Une difficulté installée ne se résout pas toujours en une heure. Un travail
-                durable demande généralement plusieurs séances progressives.
+                Cette première rencontre apporte déjà une vision globale et structurée du
+                couple : elle aide à comprendre les mécanismes en jeu, à identifier les
+                priorités et à définir sur quoi travailler ensuite. Un changement durable
+                demande généralement plusieurs séances progressives.
               </p>
 
               <div className="mt-7 flex flex-col gap-3">
@@ -259,8 +261,8 @@ export default function HomeV2() {
                   <a href="/tarifs" className={CTA_SECONDARY}>
                     Voir la page Tarifs
                   </a>
-                  <a href="/accompagnement" className={CTA_SECONDARY}>
-                    Comprendre le déroulement
+                  <a href="/contact" className={CTA_SECONDARY}>
+                    Poser une question
                   </a>
                 </div>
 

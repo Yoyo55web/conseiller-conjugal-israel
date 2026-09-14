@@ -53,13 +53,6 @@ export default function SiteHeader() {
           </a>
 
           <a
-            href="/accompagnement"
-            className="text-sm text-gray-700 hover:underline whitespace-nowrap"
-          >
-            Déroulement
-          </a>
-
-          <a
             href="/qui-sommes-nous"
             className="text-sm text-gray-700 hover:underline whitespace-nowrap"
           >
@@ -134,14 +127,6 @@ export default function SiteHeader() {
                 className="text-base text-gray-800 hover:underline"
               >
                 Préparation au mariage
-              </a>
-
-              <a
-                href="/accompagnement"
-                onClick={close}
-                className="text-base text-gray-800 hover:underline"
-              >
-                Déroulement
               </a>
 
               <a

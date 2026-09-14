@@ -8,13 +8,25 @@ const inputClass =
 export default function IntakeForm({ token }: { token: string }) {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [step, setStep] = useState<"information" | "framework">("information");
+  const [draft, setDraft] = useState<Record<string, FormDataEntryValue>>({});
+
+  function continueToFramework(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDraft(Object.fromEntries(new FormData(event.currentTarget).entries()));
+    setStep("framework");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("sending");
     setMessage("");
     const form = new FormData(event.currentTarget);
-    const payload = Object.fromEntries(form.entries());
+    const payload: Record<string, FormDataEntryValue | string> = {
+      ...draft,
+      ...Object.fromEntries(form.entries()),
+    };
     payload.husbandAccepted = form.get("husbandAccepted") === "on" ? "true" : "false";
     payload.wifeAccepted = form.get("wifeAccepted") === "on" ? "true" : "false";
     payload.privacyAccepted = form.get("privacyAccepted") === "on" ? "true" : "false";
@@ -46,15 +58,19 @@ export default function IntakeForm({ token }: { token: string }) {
     );
   }
 
-  return (
-    <form onSubmit={submit} className="space-y-8">
+  if (step === "information") {
+    return (
+      <form onSubmit={continueToFramework} className="space-y-8">
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-950">
+          <strong>Étape 1 sur 2 :</strong> informations utiles avant la première séance.
+        </div>
       <section className="rounded-3xl border bg-white p-6 md:p-8">
         <h2 className="text-2xl font-semibold">1. Vos coordonnées</h2>
         <p className="mt-2 text-sm text-gray-600">Chaque conjoint indique ses propres coordonnées.</p>
         <p className="mt-3 rounded-xl bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
-          Chacun doit pouvoir répondre librement. Si l’un de vous ne peut pas répondre à la
-          question sur la sécurité en présence de l’autre, complétez cette partie séparément
-          ou contactez directement le conseiller avant la séance commune.
+          La validation finale comporte une question personnelle sur la liberté de parole.
+          Si l’un de vous ne peut pas y répondre librement en présence de l’autre, complétez
+          cette partie séparément ou contactez directement le conseiller avant la séance commune.
         </p>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <fieldset className="space-y-4 rounded-2xl bg-gray-50 p-5">
@@ -100,12 +116,24 @@ export default function IntakeForm({ token }: { token: string }) {
         </div>
       </section>
 
+        <button className="w-full rounded-2xl bg-green-800 px-6 py-4 text-lg font-semibold text-white shadow-sm hover:bg-green-900">
+          Continuer et lire le cadre de l’accompagnement
+        </button>
+      </form>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-8">
+      <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-950">
+        <strong>Étape 2 sur 2 :</strong> lecture attentive et validation du cadre.
+      </div>
       <section className="rounded-3xl border bg-white p-6 md:p-8">
-        <h2 className="text-2xl font-semibold">3. Cadre de l’accompagnement</h2>
+        <h2 className="text-2xl font-semibold">Cadre de l’accompagnement</h2>
         <div className="mt-5 space-y-5 text-sm leading-relaxed text-gray-700">
           <div>
             <h3 className="font-semibold text-gray-950">Première séance et progression</h3>
-            <p>La première séance sert principalement à comprendre l’histoire du couple, la situation actuelle et les attentes de chacun. De premières orientations peuvent être proposées, mais un changement durable demande généralement un travail progressif. Un cycle initial de six séances est recommandé, sans obligation de poursuivre et sans garantie de résultat.</p>
+            <p>La première séance constitue déjà une étape de travail importante. Elle permet d’obtenir une image générale et structurée du couple, de comprendre ce qui entretient les difficultés, d’identifier les priorités et de déterminer sur quoi travailler par la suite. Le couple repart ainsi avec une lecture plus claire de sa situation et une direction adaptée. La mise en place de changements durables demande généralement un travail progressif ; un cycle initial de six séances est recommandé, sans obligation de poursuivre et sans garantie de résultat.</p>
           </div>
           <div>
             <h3 className="font-semibold text-gray-950">Pendant les séances</h3>
@@ -127,7 +155,7 @@ export default function IntakeForm({ token }: { token: string }) {
       </section>
 
       <section className="rounded-3xl border bg-white p-6 md:p-8">
-        <h2 className="text-2xl font-semibold">4. Validation personnelle de chacun</h2>
+        <h2 className="text-2xl font-semibold">Validation personnelle de chacun</h2>
         <p className="mt-2 text-sm text-gray-600">Chaque conjoint doit lire et valider personnellement le cadre.</p>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <fieldset className="space-y-4 rounded-2xl border p-5">
@@ -154,9 +182,22 @@ export default function IntakeForm({ token }: { token: string }) {
       </section>
 
       {status === "error" ? <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-900">{message}</p> : null}
-      <button disabled={status === "sending"} className="w-full rounded-2xl bg-green-800 px-6 py-4 text-lg font-semibold text-white shadow-sm hover:bg-green-900 disabled:opacity-60">
-        {status === "sending" ? "Enregistrement…" : "Enregistrer notre préparation"}
-      </button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => {
+            setStep("information");
+            setStatus("idle");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="rounded-2xl border bg-white px-6 py-4 font-semibold text-gray-900"
+        >
+          Revenir aux informations
+        </button>
+        <button disabled={status === "sending"} className="rounded-2xl bg-green-800 px-6 py-4 text-lg font-semibold text-white shadow-sm hover:bg-green-900 disabled:opacity-60">
+          {status === "sending" ? "Enregistrement…" : "Accepter et enregistrer"}
+        </button>
+      </div>
       <p className="text-center text-xs text-gray-500">Aucune donnée bancaire n’est demandée dans ce formulaire.</p>
     </form>
   );

@@ -61,14 +61,12 @@ export default function TarifsPage() {
         <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-6">
           <h2 className="text-lg font-semibold text-green-950">Commencer sans être enfermé</h2>
           <p className="mt-2 max-w-4xl leading-relaxed text-green-900">
-            La première rencontre est réglée seule. Elle sert principalement à évaluer la
-            situation et à définir les objectifs. Si, après cette séance, le parcours de six
+            La première rencontre est réglée seule. Elle permet d’obtenir une image générale
+            et structurée du couple, de comprendre les mécanismes en jeu, d’identifier les
+            priorités et de définir sur quoi travailler par la suite. Si le parcours de six
             rencontres est adapté et que vous souhaitez le poursuivre, la première séance est
             incluse : il reste alors <strong>1 150 ₪ ou 345 €</strong> à régler. La sixième
             séance permet de dresser un bilan et de décider librement de la suite.
-          </p>
-          <p className="mt-3 text-sm text-green-900">
-            Aucun renouvellement automatique. Les modalités pratiques sont précisées avant le début du parcours.
           </p>
         </div>
 
