@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { notFound, redirect } from "next/navigation";
+import { isAdminAuthenticated, privateFeaturesConfigured } from "@/lib/admin-auth";
 import { loginAction } from "../actions";
 
 export const metadata: Metadata = {
@@ -13,6 +13,7 @@ export default async function AdminLoginPage({
 }: {
   searchParams: Promise<{ erreur?: string }>;
 }) {
+  if (!privateFeaturesConfigured()) notFound();
   if (await isAdminAuthenticated()) redirect("/admin");
   const { erreur } = await searchParams;
 

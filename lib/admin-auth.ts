@@ -4,6 +4,15 @@ import { cookies } from "next/headers";
 const COOKIE_NAME = "cc_admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 12;
 
+export function privateFeaturesConfigured() {
+  return Boolean(
+    process.env.DATABASE_URL &&
+    process.env.DATA_ENCRYPTION_KEY &&
+    process.env.ADMIN_PASSWORD &&
+    process.env.ADMIN_SESSION_SECRET,
+  );
+}
+
 function sessionSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) throw new Error("ADMIN_SESSION_SECRET n’est pas configurée.");
