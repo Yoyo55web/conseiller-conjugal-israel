@@ -57,7 +57,7 @@ export default function IntakeForm({ token }: { token: string }) {
         <h2 className="text-2xl font-bold text-green-950">Préparation enregistrée</h2>
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-green-900">
           Vos informations et vos deux validations ont bien été enregistrées. Vous recevrez
-          séparément les dernières indications utiles avant le rendez-vous.
+          les dernières indications utiles avant le rendez-vous.
         </p>
       </div>
     );
