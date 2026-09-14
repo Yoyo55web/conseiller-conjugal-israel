@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Testimonials from "./Testimonials";
 
 const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
@@ -103,16 +104,21 @@ export default function HomeV2() {
             {/* Colonne DROITE = actions */}
             <div className="rounded-3xl border border-gray-200 bg-white/85 backdrop-blur p-10 shadow-sm">
               <h2 className="text-xl font-semibold">
-                Dès la première séance, vous commencez à y voir plus clair
+                La première séance : comprendre avant d’agir
               </h2>
 
               <ul className="mt-5 space-y-3 text-gray-800">
-                <li>• Comprendre plus clairement ce qui alimente les tensions</li>
-                <li>• Identifier ensemble le point essentiel à clarifier</li>
-                <li>• Retrouver un échange plus posé et structuré</li>
-                <li>• Repartir avec des pistes concrètes</li>
-                <li>• Définir un cap adapté pour la suite</li>
+                <li>• Retracer la situation et ce qui alimente les tensions</li>
+                <li>• Permettre à chacun d’exprimer son vécu</li>
+                <li>• Clarifier les besoins et l’objectif prioritaire</li>
+                <li>• Recevoir, lorsque la situation le permet, de premières orientations</li>
+                <li>• Définir un cap réaliste pour la suite</li>
               </ul>
+
+              <p className="mt-5 text-sm leading-relaxed text-gray-700">
+                Une difficulté installée ne se résout pas toujours en une heure. Un travail
+                durable demande généralement plusieurs séances progressives.
+              </p>
 
               <div className="mt-7 flex flex-col gap-3">
                 <a
@@ -253,6 +259,9 @@ export default function HomeV2() {
                   <a href="/tarifs" className={CTA_SECONDARY}>
                     Voir la page Tarifs
                   </a>
+                  <a href="/accompagnement" className={CTA_SECONDARY}>
+                    Comprendre le déroulement
+                  </a>
                 </div>
 
                 <p className={CTA_NOTE}>
@@ -341,6 +350,8 @@ export default function HomeV2() {
         </div>
       </section>
 
+      <Testimonials />
+
       {/* ================= FAQ ================= */}
       <section className="bg-gray-50 border-y border-gray-200">
         <div className={`${CONTAINER} ${SECTION_Y}`}>
@@ -352,7 +363,10 @@ export default function HomeV2() {
                 "Est-ce confidentiel ?",
                 "Les échanges sont traités avec discrétion et confidentialité, dans les limites prévues par la loi et la sécurité des personnes.",
               ],
-              ["Combien de séances ?", "Souvent 4 à 8 selon la situation, parfois moins."],
+                [
+                  "Combien de séances ?",
+                  "Un cycle initial de 6 séances est généralement recommandé. La sixième permet de faire le bilan et de décider librement de la suite.",
+                ],
               [
                 "Où ont lieu les consultations ?",
                 "En présentiel à Netanya, ou en visio partout dans le monde (en français).",

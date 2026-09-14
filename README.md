@@ -1,4 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Conseiller conjugal Israël
+
+Site Next.js du cabinet, avec pages publiques, formulaires privés de préparation et d’avis,
+et espace d’administration protégé.
+
+## Configuration privée
+
+Les fonctionnalités de dossier nécessitent une base PostgreSQL dédiée et quatre variables
+d’environnement. Elles doivent être enregistrées dans Vercel (Production et Preview) et ne
+jamais être ajoutées au dépôt GitHub.
+
+```bash
+DATABASE_URL=postgresql://...
+DATA_ENCRYPTION_KEY=une-cle-aleatoire-longue-et-unique
+ADMIN_PASSWORD=un-mot-de-passe-administrateur-long-et-unique
+ADMIN_SESSION_SECRET=une-seconde-cle-aleatoire-longue-et-unique
+NEXT_PUBLIC_SITE_URL=https://www.conseiller-conjugal-israel.com
+```
+
+La base recommandée est une base Neon PostgreSQL créée spécialement pour ce site depuis
+Vercel Marketplace. Le schéma est créé automatiquement lors du premier accès. Les réponses,
+les avis et les jetons de liens privés sont chiffrés côté application avant enregistrement.
+
+L’espace du conseiller est accessible sur `/admin`. Il permet de créer un dossier, de copier
+le lien de préparation et le lien d’avis, de consulter les réponses et de valider explicitement
+un témoignage avant son éventuelle publication.
+
+Stripe et le paiement en ligne ne font pas partie de cette version.
 
 ## Getting Started
 

@@ -40,6 +40,14 @@ export default function ConfidentialitePage() {
           de détail intime ou sensible dans votre premier message : une simple demande de
           disponibilités suffit.
         </p>
+        <p className="text-gray-700 leading-relaxed">
+          Lorsqu’un lien privé de préparation vous est adressé, les informations peuvent
+          également comprendre les coordonnées personnelles de chacun, des renseignements
+          familiaux limités, le motif général de la démarche, les objectifs exprimés et les
+          validations du cadre d’accompagnement. Les détails les plus intimes ne sont pas
+          demandés dans le premier message et doivent être limités à ce qui est utile à la
+          préparation de la séance.
+        </p>
       </section>
 
       <section className="space-y-3">
@@ -53,8 +61,26 @@ export default function ConfidentialitePage() {
           services peuvent impliquer un traitement hors de votre pays de résidence.
         </p>
         <p className="text-gray-700 leading-relaxed">
+          Les formulaires privés sont enregistrés dans une base de données protégée. Leur
+          contenu n’est pas envoyé intégralement par email et n’est consultable que depuis
+          l’espace d’administration du responsable du traitement. Les données sensibles y
+          sont chiffrées. Le futur prestataire de paiement sera ajouté à cette politique avant
+          l’activation de tout paiement en ligne.
+        </p>
+        <p className="text-gray-700 leading-relaxed">
           Aucune donnée n’est vendue. Elle n’est communiquée qu’aux prestataires nécessaires
           au service, sur demande légale, ou lorsque la sécurité d’une personne l’exige.
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Retours et témoignages</h2>
+        <p className="text-gray-700 leading-relaxed">
+          Après l’accompagnement, un lien privé et facultatif peut permettre de transmettre
+          un avis. Le retour reste privé par défaut. Sa publication anonyme ou avec un prénom
+          n’est possible qu’après un choix explicite de la personne et une vérification
+          préalable. Une autorisation de publication peut être retirée en écrivant à l’adresse
+          indiquée ci-dessous.
         </p>
       </section>
 

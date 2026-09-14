@@ -42,6 +42,9 @@ export default function RootLayout({
               <a href="/preparation-au-mariage" className="hover:underline">
                 Préparation au mariage
               </a>
+              <a href="/accompagnement" className="hover:underline">
+                Déroulement
+              </a>
               <a href="/qui-sommes-nous" className="hover:underline">
                 Qui suis-je
               </a>
