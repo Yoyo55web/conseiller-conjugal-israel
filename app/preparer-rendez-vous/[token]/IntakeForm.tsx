@@ -137,7 +137,7 @@ export default function IntakeForm({ token }: { token: string }) {
           </div>
           <div>
             <h3 className="font-semibold text-gray-950">Visioconférence et confidentialité</h3>
-            <p>Chaque participant s’installe dans <strong>un endroit calme et privé</strong>. <strong>Aucun enregistrement ni capture</strong> ne peut être effectué sans l’accord de tous. Les échanges sont traités avec discrétion, dans les limites prévues par la loi et la sécurité des personnes. <strong>Ce service n’est pas un service d’urgence.</strong></p>
+            <p>Chaque participant s’installe dans <strong>un endroit calme et privé</strong>. <strong>Aucun participant n’est autorisé à filmer, photographier, enregistrer, retransmettre ou effectuer une capture d’écran de tout ou partie d’une séance, par quelque moyen que ce soit.</strong> Les échanges sont traités avec discrétion, dans les limites prévues par la loi et la sécurité des personnes.</p>
           </div>
         </div>
       </section>
