@@ -135,6 +135,11 @@ export default function IntakeForm({ token }: { token: string }) {
             <h3 className="font-semibold text-gray-950">Première séance et progression</h3>
             <p>La première séance constitue déjà une étape de travail importante. Elle permet d’obtenir une image générale et structurée du couple, de comprendre ce qui entretient les difficultés, d’identifier les priorités et de déterminer sur quoi travailler par la suite. Le couple repart ainsi avec une lecture plus claire de sa situation et une direction adaptée. La mise en place de changements durables demande généralement un travail progressif ; un cycle initial de six séances est recommandé, sans obligation de poursuivre et sans garantie de résultat.</p>
           </div>
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
+            <h3 className="font-semibold text-green-950">Conditions tarifaires et cycle recommandé</h3>
+            <p className="mt-2 text-green-950">Le tarif d’une séance de couple de 50 à 60 minutes est de <strong>250 ₪ ou 75 €</strong>. Un cycle initial de six séances est recommandé pour permettre un véritable travail et un bilan. Son tarif est de <strong>1 400 ₪ ou 420 €</strong>, au lieu de 1 500 ₪ ou 450 €.</p>
+            <p className="mt-2 text-green-950">La première rencontre est réglée seule. Si vous décidez ensuite de poursuivre avec le cycle, cette première séance est incluse et il reste <strong>1 150 ₪ ou 345 €</strong> à régler. Le cycle n’est pas obligatoire et ne fait l’objet d’aucune reconduction automatique.</p>
+          </div>
           <div>
             <h3 className="font-semibold text-gray-950">Pendant les séances</h3>
             <p>Chacun parle à son tour sans être interrompu. Les insultes, menaces, humiliations et propos violents ne sont pas acceptés. Les téléphones restent silencieux et les enfants ne participent pas. La séance peut être interrompue si le cadre n’est plus respecté.</p>
@@ -156,7 +161,7 @@ export default function IntakeForm({ token }: { token: string }) {
 
       <section className="rounded-3xl border bg-white p-6 md:p-8">
         <h2 className="text-2xl font-semibold">Validation personnelle de chacun</h2>
-        <p className="mt-2 text-sm text-gray-600">Chaque conjoint doit lire et valider personnellement le cadre.</p>
+        <p className="mt-2 text-sm leading-relaxed text-gray-600">Chaque conjoint doit lire l’ensemble de cette page et confirmer personnellement son accord. La validation de l’un ne remplace pas celle de l’autre.</p>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <fieldset className="space-y-4 rounded-2xl border p-5">
             <legend className="px-2 font-semibold">Validation de l’époux</legend>
@@ -164,7 +169,7 @@ export default function IntakeForm({ token }: { token: string }) {
               <select className={inputClass} name="husbandSafe" required><option value="">Choisir</option><option value="oui">Oui</option><option value="non">Non</option><option value="à_aborder_en_privé">Je souhaite l’aborder en privé</option></select>
             </label>
             <label className="block text-sm font-medium">Nom complet servant de validation<input className={inputClass} name="husbandSignature" required /></label>
-            <label className="flex items-start gap-3 text-sm"><input className="mt-1 h-4 w-4" type="checkbox" name="husbandAccepted" required /><span>J’ai personnellement lu et j’accepte le cadre de l’accompagnement.</span></label>
+            <label className="flex items-start gap-3 text-sm"><input className="mt-1 h-4 w-4" type="checkbox" name="husbandAccepted" required /><span>J’ai personnellement lu et j’accepte le cadre, le fonctionnement proposé et les conditions tarifaires de l’accompagnement.</span></label>
           </fieldset>
           <fieldset className="space-y-4 rounded-2xl border p-5">
             <legend className="px-2 font-semibold">Validation de l’épouse</legend>
@@ -172,7 +177,7 @@ export default function IntakeForm({ token }: { token: string }) {
               <select className={inputClass} name="wifeSafe" required><option value="">Choisir</option><option value="oui">Oui</option><option value="non">Non</option><option value="à_aborder_en_privé">Je souhaite l’aborder en privé</option></select>
             </label>
             <label className="block text-sm font-medium">Nom complet servant de validation<input className={inputClass} name="wifeSignature" required /></label>
-            <label className="flex items-start gap-3 text-sm"><input className="mt-1 h-4 w-4" type="checkbox" name="wifeAccepted" required /><span>J’ai personnellement lu et j’accepte le cadre de l’accompagnement.</span></label>
+            <label className="flex items-start gap-3 text-sm"><input className="mt-1 h-4 w-4" type="checkbox" name="wifeAccepted" required /><span>J’ai personnellement lu et j’accepte le cadre, le fonctionnement proposé et les conditions tarifaires de l’accompagnement.</span></label>
           </fieldset>
         </div>
         <label className="mt-6 flex items-start gap-3 rounded-2xl bg-gray-50 p-4 text-sm">

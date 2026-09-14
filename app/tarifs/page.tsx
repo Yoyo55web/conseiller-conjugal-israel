@@ -27,7 +27,7 @@ export default function TarifsPage() {
         </p>
 
         {/* Cartes offres */}
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
             [
               "Séance de couple",
@@ -38,11 +38,6 @@ export default function TarifsPage() {
               "Séance individuelle",
               "250 ₪ ou 75 €",
               "50–60 minutes • En visioconférence",
-            ],
-            [
-              "Parcours initial couple",
-              "1 400 ₪ ou 420 €",
-              "6 séances, première séance et bilan inclus • au lieu de 1 500 ₪ ou 450 €",
             ],
             [
               "Préparation au mariage",
@@ -56,18 +51,6 @@ export default function TarifsPage() {
               <div className="mt-2 text-sm text-gray-600">{line2}</div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-6">
-          <h2 className="text-lg font-semibold text-green-950">Commencer sans être enfermé</h2>
-          <p className="mt-2 max-w-4xl leading-relaxed text-green-900">
-            La première rencontre est réglée seule. Elle permet d’obtenir une image générale
-            et structurée du couple, de comprendre les mécanismes en jeu, d’identifier les
-            priorités et de définir sur quoi travailler par la suite. Si le parcours de six
-            rencontres est adapté et que vous souhaitez le poursuivre, la première séance est
-            incluse : il reste alors <strong>1 150 ₪ ou 345 €</strong> à régler. La sixième
-            séance permet de dresser un bilan et de décider librement de la suite.
-          </p>
         </div>
 
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6">
@@ -131,10 +114,6 @@ export default function TarifsPage() {
         {/* FAQ courte tarifs */}
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {[
-            [
-              "Faut-il obligatoirement réserver six séances ?",
-              "Non. Le cycle de six séances est recommandé pour permettre un véritable travail, mais vous restez libre de commencer par une première séance et de décider ensuite.",
-            ],
             [
               "Combien de séances comprend la préparation au mariage ?",
               "Le parcours complet comprend généralement 15 à 20 séances. Un format accéléré d’environ 10 séances, ou parfois moins, peut être proposé selon les besoins.",
