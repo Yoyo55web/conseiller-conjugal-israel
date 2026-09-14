@@ -11,6 +11,11 @@ export default function IntakeForm({ token }: { token: string }) {
   const [step, setStep] = useState<"information" | "framework">("information");
   const [draft, setDraft] = useState<Record<string, FormDataEntryValue>>({});
 
+  function draftText(name: string) {
+    const value = draft[name];
+    return typeof value === "string" ? value : "";
+  }
+
   function continueToFramework(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setDraft(Object.fromEntries(new FormData(event.currentTarget).entries()));
@@ -71,28 +76,28 @@ export default function IntakeForm({ token }: { token: string }) {
           <fieldset className="space-y-4 rounded-2xl bg-gray-50 p-5">
             <legend className="px-2 font-semibold">Époux</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-medium">Prénom<input className={inputClass} name="husbandFirstName" required /></label>
-              <label className="text-sm font-medium">Nom<input className={inputClass} name="husbandLastName" required /></label>
-              <label className="text-sm font-medium">Âge<input className={inputClass} name="husbandAge" inputMode="numeric" required /></label>
-              <label className="text-sm font-medium">Téléphone<input className={inputClass} name="husbandPhone" type="tel" required /></label>
+              <label className="text-sm font-medium">Prénom<input className={inputClass} name="husbandFirstName" defaultValue={draftText("husbandFirstName")} required /></label>
+              <label className="text-sm font-medium">Nom<input className={inputClass} name="husbandLastName" defaultValue={draftText("husbandLastName")} required /></label>
+              <label className="text-sm font-medium">Âge<input className={inputClass} name="husbandAge" defaultValue={draftText("husbandAge")} inputMode="numeric" required /></label>
+              <label className="text-sm font-medium">Téléphone<input className={inputClass} name="husbandPhone" defaultValue={draftText("husbandPhone")} type="tel" required /></label>
             </div>
-            <label className="block text-sm font-medium">Email personnel<input className={inputClass} name="husbandEmail" type="email" autoComplete="email" required /></label>
+            <label className="block text-sm font-medium">Email personnel<input className={inputClass} name="husbandEmail" defaultValue={draftText("husbandEmail")} type="email" autoComplete="email" required /></label>
           </fieldset>
           <fieldset className="space-y-4 rounded-2xl bg-gray-50 p-5">
             <legend className="px-2 font-semibold">Épouse</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-medium">Prénom<input className={inputClass} name="wifeFirstName" required /></label>
-              <label className="text-sm font-medium">Nom<input className={inputClass} name="wifeLastName" required /></label>
-              <label className="text-sm font-medium">Âge<input className={inputClass} name="wifeAge" inputMode="numeric" required /></label>
-              <label className="text-sm font-medium">Téléphone<input className={inputClass} name="wifePhone" type="tel" required /></label>
+              <label className="text-sm font-medium">Prénom<input className={inputClass} name="wifeFirstName" defaultValue={draftText("wifeFirstName")} required /></label>
+              <label className="text-sm font-medium">Nom<input className={inputClass} name="wifeLastName" defaultValue={draftText("wifeLastName")} required /></label>
+              <label className="text-sm font-medium">Âge<input className={inputClass} name="wifeAge" defaultValue={draftText("wifeAge")} inputMode="numeric" required /></label>
+              <label className="text-sm font-medium">Téléphone<input className={inputClass} name="wifePhone" defaultValue={draftText("wifePhone")} type="tel" required /></label>
             </div>
-            <label className="block text-sm font-medium">Email personnel<input className={inputClass} name="wifeEmail" type="email" autoComplete="email" required /></label>
+            <label className="block text-sm font-medium">Email personnel<input className={inputClass} name="wifeEmail" defaultValue={draftText("wifeEmail")} type="email" autoComplete="email" required /></label>
           </fieldset>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <label className="text-sm font-medium">Date du mariage<input className={inputClass} name="marriageDate" type="date" /></label>
-          <label className="text-sm font-medium">Pays de résidence<input className={inputClass} name="country" required /></label>
-          <label className="text-sm font-medium md:col-span-1">Enfants : nombre et âges<input className={inputClass} name="children" placeholder="Ex. 3 enfants : 8, 5 et 2 ans" /></label>
+          <label className="text-sm font-medium">Date du mariage<input className={inputClass} name="marriageDate" defaultValue={draftText("marriageDate")} type="date" /></label>
+          <label className="text-sm font-medium">Pays de résidence<input className={inputClass} name="country" defaultValue={draftText("country")} required /></label>
+          <label className="text-sm font-medium md:col-span-1">Enfants : nombre et âges<input className={inputClass} name="children" defaultValue={draftText("children")} placeholder="Ex. 3 enfants : 8, 5 et 2 ans" /></label>
         </div>
       </section>
 
