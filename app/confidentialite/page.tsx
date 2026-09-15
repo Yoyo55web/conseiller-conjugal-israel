@@ -51,6 +51,16 @@ export default function ConfidentialitePage() {
       </section>
 
       <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Enregistrement des séances</h2>
+        <p className="text-gray-700 leading-relaxed">
+          Pour préserver la confidentialité des échanges, il est strictement interdit à tout
+          participant de photographier, filmer, enregistrer, retransmettre ou effectuer une
+          capture d’écran de tout ou partie d’une séance, par quelque moyen que ce soit. Le
+          non-respect de cette règle peut entraîner l’interruption immédiate de la séance.
+        </p>
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-xl font-semibold">Prestataires techniques</h2>
         <p className="text-gray-700 leading-relaxed">
           Le site est hébergé par Vercel, qui peut traiter des données techniques et des
