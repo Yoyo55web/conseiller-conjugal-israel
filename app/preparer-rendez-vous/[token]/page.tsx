@@ -14,12 +14,15 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
   const { token } = await params;
   const dossier = await findDossierByIntakeToken(token).catch(() => null);
   if (!dossier) notFound();
+  const isIndividual = dossier.consultationType === "individual";
 
   return (
     <main className="bg-gray-50 px-5 py-12">
       <div className="mx-auto max-w-4xl">
         <p className="text-sm font-semibold text-green-800">Lien personnel et confidentiel</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Préparer votre premier rendez-vous</h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+          {isIndividual ? "Préparer votre premier rendez-vous individuel" : "Préparer votre premier rendez-vous"}
+        </h1>
         <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">
           Ce formulaire permet de consacrer davantage de temps à votre situation pendant la séance.
         </p>
@@ -32,9 +35,13 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
           {dossier.intakeCompletedAt ? (
             <div className="rounded-3xl border border-green-200 bg-green-50 p-8 text-center">
               <h2 className="text-2xl font-bold text-green-950">Formulaire déjà enregistré</h2>
-              <p className="mt-3 text-green-900">Votre préparation et les deux validations ont bien été reçues.</p>
+              <p className="mt-3 text-green-900">
+                {isIndividual
+                  ? "Votre préparation et vos validations ont bien été reçues."
+                  : "Votre préparation et les validations de chacun ont bien été reçues."}
+              </p>
             </div>
-          ) : <IntakeForm token={token} />}
+          ) : <IntakeForm token={token} consultationType={dossier.consultationType} />}
         </div>
       </div>
     </main>

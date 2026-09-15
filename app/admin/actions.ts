@@ -8,9 +8,21 @@ import {
   isAdminAuthenticated,
   passwordIsValid,
 } from "@/lib/admin-auth";
-import { createDossier, setFeedbackApproval } from "@/lib/db";
+import {
+  clearDossierIntake,
+  createDossier,
+  deleteDossier,
+  deleteFeedback,
+  setFeedbackApproval,
+} from "@/lib/db";
+import type { ConsultationType } from "@/lib/consultation-framework";
 
 const APPOINTMENT_MODES = new Set(["visio", "domicile", "presentiel"]);
+const CONSULTATION_TYPES = new Set<ConsultationType>(["couple", "individual"]);
+
+function validId(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
 
 function israelLocalDateTimeToIso(value: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
@@ -60,9 +72,11 @@ export async function createDossierAction(formData: FormData) {
   const appointmentAt = appointmentValue ? israelLocalDateTimeToIso(appointmentValue) : undefined;
   const requestedMode = String(formData.get("appointmentMode") || "visio");
   const appointmentMode = APPOINTMENT_MODES.has(requestedMode) ? requestedMode : "visio";
+  const requestedType = String(formData.get("consultationType") || "couple") as ConsultationType;
+  const consultationType = CONSULTATION_TYPES.has(requestedType) ? requestedType : "couple";
   if (label.length < 2) redirect("/admin?erreur=dossier");
   if (appointmentValue && !appointmentAt) redirect("/admin?erreur=dossier");
-  await createDossier({ label, appointmentAt, appointmentMode });
+  await createDossier({ label, appointmentAt, appointmentMode, consultationType });
   revalidatePath("/admin");
   redirect("/admin?creation=ok");
 }
@@ -74,4 +88,33 @@ export async function approveFeedbackAction(formData: FormData) {
   if (id) await setFeedbackApproval(id, approved);
   revalidatePath("/admin");
   revalidatePath("/");
+}
+
+export async function clearDossierIntakeAction(formData: FormData) {
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+  const id = String(formData.get("id") || "");
+  if (!validId(id)) redirect("/admin?erreur=suppression");
+  await clearDossierIntake(id);
+  revalidatePath("/admin");
+  redirect("/admin?suppression=reponses");
+}
+
+export async function deleteDossierAction(formData: FormData) {
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+  const id = String(formData.get("id") || "");
+  if (!validId(id)) redirect("/admin?erreur=suppression");
+  await deleteDossier(id);
+  revalidatePath("/admin");
+  revalidatePath("/");
+  redirect("/admin?suppression=dossier");
+}
+
+export async function deleteFeedbackAction(formData: FormData) {
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+  const id = String(formData.get("id") || "");
+  if (!validId(id)) redirect("/admin?erreur=suppression");
+  await deleteFeedback(id);
+  revalidatePath("/admin");
+  revalidatePath("/");
+  redirect("/admin?suppression=avis");
 }

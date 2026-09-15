@@ -1,5 +1,6 @@
 import postgres from "postgres";
 import { decryptValue, encryptValue, hashToken, newPrivateToken } from "./secure-data";
+import type { ConsultationType } from "./consultation-framework";
 
 let client: ReturnType<typeof postgres> | null = null;
 let schemaReady: Promise<void> | null = null;
@@ -25,6 +26,7 @@ async function ensureSchema() {
         create table if not exists consultation_dossiers (
           id text primary key,
           label text not null,
+          consultation_type text not null default 'couple',
           appointment_at timestamptz,
           appointment_mode text not null default 'visio',
           intake_token_hash text not null unique,
@@ -36,6 +38,10 @@ async function ensureSchema() {
           created_at timestamptz not null default now(),
           updated_at timestamptz not null default now()
         )
+      `;
+      await sql`
+        alter table consultation_dossiers
+        add column if not exists consultation_type text not null default 'couple'
       `;
       await sql`
         create table if not exists consultation_feedback (
@@ -58,32 +64,47 @@ async function ensureSchema() {
 }
 
 export type IntakeData = {
-  husbandFirstName: string;
-  husbandLastName: string;
-  husbandAge: string;
-  husbandEmail: string;
-  husbandPhone: string;
-  wifeFirstName: string;
-  wifeLastName: string;
-  wifeAge: string;
-  wifeEmail: string;
-  wifePhone: string;
+  consultationType?: ConsultationType;
+  husbandFirstName?: string;
+  husbandLastName?: string;
+  husbandAge?: string;
+  husbandEmail?: string;
+  husbandPhone?: string;
+  wifeFirstName?: string;
+  wifeLastName?: string;
+  wifeAge?: string;
+  wifeEmail?: string;
+  wifePhone?: string;
+  individualFirstName?: string;
+  individualLastName?: string;
+  individualAge?: string;
+  individualEmail?: string;
+  individualPhone?: string;
   marriageDate: string;
   country: string;
   children: string;
-  previousSupport: string;
-  mainReason: string;
-  difficultySince: string;
-  priority: string;
-  husbandSafe: string;
-  wifeSafe: string;
-  husbandAccepted: boolean;
-  wifeAccepted: boolean;
-  husbandSignature: string;
-  wifeSignature: string;
+  previousSupport?: string;
+  mainReason?: string;
+  difficultySince?: string;
+  priority?: string;
+  husbandSafe?: string;
+  wifeSafe?: string;
+  husbandAccepted?: boolean;
+  wifeAccepted?: boolean;
+  individualAccepted?: boolean;
+  husbandKeyRulesAccepted?: boolean;
+  wifeKeyRulesAccepted?: boolean;
+  individualKeyRulesAccepted?: boolean;
+  husbandSignature?: string;
+  wifeSignature?: string;
+  individualSignature?: string;
   privacyAccepted: boolean;
   acceptedAt: string;
   frameworkVersion: string;
+  frameworkDigest?: string;
+  frameworkSnapshot?: string;
+  acceptedTextDigest?: string;
+  acceptedTextSnapshot?: string;
 };
 
 export type FeedbackData = {
@@ -100,6 +121,7 @@ export async function createDossier(input: {
   label: string;
   appointmentAt?: string;
   appointmentMode: string;
+  consultationType: ConsultationType;
 }) {
   await ensureSchema();
   const sql = sqlClient();
@@ -108,11 +130,11 @@ export async function createDossier(input: {
   const feedbackToken = newPrivateToken();
   await sql`
     insert into consultation_dossiers (
-      id, label, appointment_at, appointment_mode,
+      id, label, consultation_type, appointment_at, appointment_mode,
       intake_token_hash, intake_token_cipher,
       feedback_token_hash, feedback_token_cipher
     ) values (
-      ${id}, ${input.label}, ${input.appointmentAt || null}, ${input.appointmentMode},
+      ${id}, ${input.label}, ${input.consultationType}, ${input.appointmentAt || null}, ${input.appointmentMode},
       ${hashToken(intakeToken)}, ${encryptValue(intakeToken)},
       ${hashToken(feedbackToken)}, ${encryptValue(feedbackToken)}
     )
@@ -131,6 +153,7 @@ export async function listDossiers() {
   return rows.map((row) => ({
     id: String(row.id),
     label: String(row.label),
+    consultationType: (row.consultation_type === "individual" ? "individual" : "couple") as ConsultationType,
     appointmentAt: row.appointment_at ? new Date(row.appointment_at).toISOString() : null,
     appointmentMode: String(row.appointment_mode),
     intakeCompletedAt: row.intake_completed_at
@@ -147,7 +170,7 @@ export async function listDossiers() {
 export async function findDossierByIntakeToken(token: string) {
   await ensureSchema();
   const rows = await sqlClient()`
-    select id, label, appointment_at, appointment_mode, intake_cipher, intake_completed_at
+    select id, label, consultation_type, appointment_at, appointment_mode, intake_cipher, intake_completed_at
     from consultation_dossiers where intake_token_hash = ${hashToken(token)} limit 1
   `;
   const row = rows[0];
@@ -155,6 +178,7 @@ export async function findDossierByIntakeToken(token: string) {
   return {
     id: String(row.id),
     label: String(row.label),
+    consultationType: (row.consultation_type === "individual" ? "individual" : "couple") as ConsultationType,
     appointmentAt: row.appointment_at ? new Date(row.appointment_at).toISOString() : null,
     appointmentMode: String(row.appointment_mode),
     intake: decryptValue<IntakeData>(row.intake_cipher ? String(row.intake_cipher) : null),
@@ -169,7 +193,7 @@ export async function saveIntake(token: string, data: IntakeData) {
   const rows = await sqlClient()`
     update consultation_dossiers
     set intake_cipher = ${encryptValue(data)}, intake_completed_at = now(), updated_at = now()
-    where intake_token_hash = ${hashToken(token)}
+    where intake_token_hash = ${hashToken(token)} and intake_completed_at is null
     returning id
   `;
   return rows.length > 0;
@@ -221,6 +245,25 @@ export async function setFeedbackApproval(id: string, approved: boolean) {
     update consultation_feedback set publication_approved = ${approved}, updated_at = now()
     where id = ${id}
   `;
+}
+
+export async function clearDossierIntake(id: string) {
+  await ensureSchema();
+  await sqlClient()`
+    update consultation_dossiers
+    set intake_cipher = null, intake_completed_at = null, updated_at = now()
+    where id = ${id}
+  `;
+}
+
+export async function deleteDossier(id: string) {
+  await ensureSchema();
+  await sqlClient()`delete from consultation_dossiers where id = ${id}`;
+}
+
+export async function deleteFeedback(id: string) {
+  await ensureSchema();
+  await sqlClient()`delete from consultation_feedback where id = ${id}`;
 }
 
 export async function listPublicFeedback() {
