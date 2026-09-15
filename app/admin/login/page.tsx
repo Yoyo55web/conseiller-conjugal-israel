@@ -23,7 +23,7 @@ export default async function AdminLoginPage({
         <p className="text-sm font-semibold text-green-800">Espace strictement privé</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight">Accès conseiller</h1>
         <p className="mt-3 text-sm leading-relaxed text-gray-600">
-          Cet espace contient les dossiers préparatoires et les retours des couples.
+          Cet espace contient les dossiers préparatoires et les retours des personnes et des couples.
         </p>
         {erreur ? (
           <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-800">

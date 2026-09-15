@@ -164,7 +164,7 @@ export default async function AdminPage({
               <input
                 name="label"
                 required
-                placeholder="Ex. Couple B. – septembre 2026"
+                placeholder="Ex. Couple B. ou Mme D. – septembre 2026"
                 className="mt-2 w-full rounded-xl border px-4 py-3 font-normal"
               />
             </label>
