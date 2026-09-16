@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { listDossiers, listFeedback, type IntakeData } from "@/lib/db";
 import type { ConsultationType } from "@/lib/consultation-framework";
+import { formatPaymentAmount, PAYMENT_OPTIONS } from "@/lib/payment-config";
 import {
   approveFeedbackAction,
+  chargeDossierPaymentAction,
   clearDossierIntakeAction,
   createDossierAction,
   deleteDossierAction,
@@ -37,6 +39,18 @@ function formatDate(value?: string | null, dateOnly = false) {
 
 function proofValue(value: boolean | undefined) {
   return value === undefined ? "Non enregistré séparément dans cette ancienne version" : value ? "Oui" : "Non";
+}
+
+function paymentStatusLabel(status: string) {
+  switch (status) {
+    case "setup_pending": return "Saisie Stripe en cours";
+    case "ready": return "Moyen de paiement prêt";
+    case "charge_pending": return "Débit en cours de vérification";
+    case "requires_action": return "Action du client nécessaire";
+    case "paid": return "Payé";
+    case "failed": return "Échec à vérifier";
+    default: return "Moyen de paiement non enregistré";
+  }
 }
 
 function IntakeSummary({ intake, type }: { intake: IntakeData; type: ConsultationType }) {
@@ -109,10 +123,10 @@ function IntakeSummary({ intake, type }: { intake: IntakeData; type: Consultatio
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ creation?: string; erreur?: string; suppression?: string }>;
+  searchParams: Promise<{ creation?: string; erreur?: string; suppression?: string; paiement?: string; prochain?: string }>;
 }) {
   if (!(await isAdminAuthenticated())) redirect("/admin/login");
-  const [{ creation, erreur, suppression }, dossiers, feedback] = await Promise.all([
+  const [{ creation, erreur, suppression, paiement, prochain }, dossiers, feedback] = await Promise.all([
     searchParams,
     listDossiers(),
     listFeedback(),
@@ -149,7 +163,28 @@ export default async function AdminPage({
         ) : null}
         {erreur ? (
           <p className="rounded-xl bg-red-50 p-4 text-sm text-red-900">
-            Le dossier n’a pas pu être créé. Vérifiez le nom indiqué.
+            {erreur === "stripe-suppression"
+              ? "La suppression a été interrompue car les données Stripe n’ont pas pu être supprimées. Réessayez avant de supprimer le dossier local."
+              : "L’opération n’a pas pu aboutir. Vérifiez les informations indiquées."}
+          </p>
+        ) : null}
+        {paiement ? (
+          <p className={`rounded-xl p-4 text-sm ${paiement === "ok" ? "bg-green-50 text-green-900" : "bg-amber-50 text-amber-950"}`}>
+            {paiement === "ok"
+              ? "Le paiement a bien été confirmé par Stripe."
+              : paiement === "avant-seance"
+                ? "Débit bloqué : la séance et sa durée prévue ne sont pas encore terminées."
+                : paiement === "date-manquante"
+                  ? "Débit bloqué : renseignez d’abord la date du rendez-vous."
+                  : paiement === "ferme"
+                    ? `Débit bloqué pendant Chabbat ou Yom Tov.${prochain ? ` Prochaine ouverture : ${formatDate(prochain)}.` : ""}`
+                    : paiement === "action-client"
+                      ? "Stripe demande une vérification supplémentaire du titulaire. Renvoyez-lui le lien de paiement du dossier."
+                      : paiement === "deja-regle"
+                        ? "Ce dossier est déjà réglé."
+                        : paiement === "verification"
+                          ? "Stripe vérifie le paiement. Actualisez la page dans quelques instants."
+                          : "Le débit n’a pas abouti. Consultez le statut du dossier avant de réessayer."}
           </p>
         ) : null}
 
@@ -216,6 +251,55 @@ export default async function AdminPage({
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
                   <CopyLink label="Lien de préparation" value={intakeUrl} />
                   <CopyLink label="Lien d’avis après l’accompagnement" value={feedbackUrl} />
+                </div>
+                <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h4 className="font-semibold">Paiement Stripe</h4>
+                      <p className="mt-1">{paymentStatusLabel(dossier.payment.status)}</p>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${dossier.payment.status === "paid" ? "bg-green-100 text-green-900" : dossier.payment.status === "ready" ? "bg-blue-100 text-blue-900" : "bg-white text-gray-700"}`}>
+                      {dossier.payment.status === "paid" ? "Réglé" : dossier.payment.cardLast4 ? `•••• ${dossier.payment.cardLast4}` : "En attente"}
+                    </span>
+                  </div>
+                  {dossier.payment.plan && dossier.payment.currency && dossier.payment.amount !== null ? (
+                    <div className="mt-3 grid gap-2 md:grid-cols-2">
+                      <p><strong>Choix :</strong> {PAYMENT_OPTIONS[dossier.payment.plan].label}</p>
+                      <p><strong>Montant autorisé :</strong> {formatPaymentAmount(dossier.payment.amount, dossier.payment.currency)}</p>
+                      {dossier.payment.authorization ? (
+                        <>
+                          <p><strong>Titulaire :</strong> {dossier.payment.authorization.cardholderName}</p>
+                          <p><strong>Email du reçu :</strong> {dossier.payment.authorization.receiptEmail}</p>
+                          <p><strong>Autorisation horodatée :</strong> {formatDate(dossier.payment.authorization.consentAt)}</p>
+                          <p><strong>Version :</strong> {dossier.payment.authorization.termsVersion}</p>
+                          <details className="md:col-span-2 rounded-lg border border-blue-100 bg-white p-3">
+                            <summary className="cursor-pointer font-medium">Voir l’autorisation exacte</summary>
+                            <pre className="mt-3 whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-700">{dossier.payment.authorization.termsSnapshot}</pre>
+                            <code className="mt-3 block break-all text-xs text-gray-500">Empreinte : {dossier.payment.authorization.termsDigest}</code>
+                          </details>
+                        </>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {dossier.payment.lastError ? (
+                    <p className="mt-3 rounded-lg bg-white p-3 text-red-800"><strong>Dernier message :</strong> {dossier.payment.lastError}</p>
+                  ) : null}
+                  {dossier.payment.stripePaymentMethodId && ["ready", "failed"].includes(dossier.payment.status) ? (
+                    <form action={chargeDossierPaymentAction} className="mt-4">
+                      <input type="hidden" name="id" value={dossier.id} />
+                      <ConfirmActionButton
+                        tone="warning"
+                        confirmation={`Confirmer le débit de ${dossier.payment.amount !== null && dossier.payment.currency ? formatPaymentAmount(dossier.payment.amount, dossier.payment.currency) : "la somme autorisée"} ? Cette action ne doit être utilisée qu’après la séance.`}
+                      >
+                        Encaisser après la séance
+                      </ConfirmActionButton>
+                    </form>
+                  ) : null}
+                  {dossier.payment.status === "requires_action" ? (
+                    <div className="mt-3">
+                      <CopyLink label="Lien à renvoyer pour la vérification Stripe" value={`${intakeUrl}/paiement`} />
+                    </div>
+                  ) : null}
                 </div>
                 {dossier.intake ? (
                   <details className="mt-5 rounded-xl border bg-gray-50 p-4">

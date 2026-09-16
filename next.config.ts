@@ -6,12 +6,12 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://js.stripe.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com",
+  "img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com https://*.stripe.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com",
-  "frame-src 'none'",
+  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://api.stripe.com https://r.stripe.com https://*.stripe.com",
+  "frame-src https://js.stripe.com https://hooks.stripe.com https://*.stripe.com",
   "upgrade-insecure-requests",
 ].join("; ");
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   consultationFrameworks,
   generalAcceptanceStatement,
@@ -38,6 +39,7 @@ export default function IntakeForm({
   token: string;
   consultationType: ConsultationType;
 }) {
+  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [step, setStep] = useState<"information" | "framework">("information");
@@ -90,7 +92,7 @@ export default function IntakeForm({
       return;
     }
     setStatus("success");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`/preparer-rendez-vous/${encodeURIComponent(token)}/paiement`);
   }
 
   if (status === "success") {
@@ -111,7 +113,7 @@ export default function IntakeForm({
     return (
       <form onSubmit={continueToFramework} className="space-y-8">
         <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-950">
-          <strong>Étape 1 sur 2 :</strong> informations utiles avant la première séance.
+          <strong>Étape 1 sur 3 :</strong> informations utiles avant la première séance.
         </div>
 
         <section className="rounded-3xl border bg-white p-6 md:p-8">
@@ -173,7 +175,7 @@ export default function IntakeForm({
   return (
     <form onSubmit={submit} className="space-y-8">
       <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-950">
-        <strong>Étape 2 sur 2 :</strong> lecture attentive et validation du cadre.
+        <strong>Étape 2 sur 3 :</strong> lecture attentive et validation du cadre.
       </div>
       <section className="rounded-3xl border bg-white p-6 md:p-8">
         <h2 className="text-2xl font-semibold">Cadre de l’accompagnement</h2>
@@ -237,7 +239,9 @@ export default function IntakeForm({
           {status === "sending" ? "Enregistrement…" : "Accepter et enregistrer"}
         </button>
       </div>
-      <p className="text-center text-xs text-gray-500">Aucune donnée bancaire n’est demandée dans ce formulaire.</p>
+      <p className="text-center text-xs text-gray-500">
+        Après cette validation, vous accéderez à une page Stripe séparée et sécurisée.
+      </p>
     </form>
   );
 }

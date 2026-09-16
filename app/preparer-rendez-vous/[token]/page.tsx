@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { findDossierByIntakeToken } from "@/lib/db";
 import IntakeForm from "./IntakeForm";
@@ -40,6 +41,12 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
                   ? "Votre préparation et vos validations ont bien été reçues."
                   : "Votre préparation et les validations de chacun ont bien été reçues."}
               </p>
+              <Link
+                href={`/preparer-rendez-vous/${token}/paiement`}
+                className="mt-6 inline-block rounded-xl bg-green-800 px-5 py-3 font-semibold text-white"
+              >
+                {dossier.payment.stripePaymentMethodId ? "Voir la confirmation" : "Continuer vers le moyen de paiement"}
+              </Link>
             </div>
           ) : <IntakeForm token={token} consultationType={dossier.consultationType} />}
         </div>

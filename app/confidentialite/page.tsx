@@ -74,8 +74,17 @@ export default function ConfidentialitePage() {
           Les formulaires privés sont enregistrés dans une base de données protégée. Leur
           contenu n’est pas envoyé intégralement par email et n’est consultable que depuis
           l’espace d’administration du responsable du traitement. Les données sensibles y
-          sont chiffrées. Le futur prestataire de paiement sera ajouté à cette politique avant
-          l’activation de tout paiement en ligne.
+          sont chiffrées.
+        </p>
+        <p className="text-gray-700 leading-relaxed">
+          Lorsque vous enregistrez un moyen de paiement, les données de carte sont saisies et
+          traitées directement par <strong>Stripe</strong>. Le site ne reçoit ni ne conserve le
+          numéro complet de la carte ou son cryptogramme. Sont conservés uniquement les
+          identifiants techniques Stripe nécessaires, la formule et le montant choisis, le
+          statut du paiement, les informations partielles permettant d’identifier la carte
+          (marque, quatre derniers chiffres et échéance), ainsi que la preuve horodatée de
+          l’autorisation donnée. Stripe traite ces données selon sa propre politique de
+          confidentialité et peut les traiter hors de votre pays de résidence.
         </p>
         <p className="text-gray-700 leading-relaxed">
           Aucune donnée n’est vendue. Elle n’est communiquée qu’aux prestataires nécessaires

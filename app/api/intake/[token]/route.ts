@@ -160,7 +160,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     if (!saved) {
       return Response.json({ error: "Ce formulaire a déjà été enregistré ou le lien n’est plus valide." }, { status: 409 });
     }
-    return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json(
+      { ok: true, nextUrl: `/preparer-rendez-vous/${token}/paiement` },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch {
     return Response.json({ error: "Le service d’enregistrement est momentanément indisponible." }, { status: 503 });
   }
