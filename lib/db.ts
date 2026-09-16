@@ -6,14 +6,25 @@ import type { PaymentCurrency, PaymentPlan } from "./payment-config";
 let client: ReturnType<typeof postgres> | null = null;
 let schemaReady: Promise<void> | null = null;
 
+function databaseSchema() {
+  const schema = process.env.DATABASE_SCHEMA?.trim();
+  if (!schema) return null;
+  if (!/^[a-z][a-z0-9_]{0,62}$/.test(schema)) {
+    throw new Error("DATABASE_SCHEMA doit être un identifiant PostgreSQL simple.");
+  }
+  return schema;
+}
+
 function sqlClient() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL n’est pas configurée.");
   if (!client) {
+    const schema = databaseSchema();
     client = postgres(url, {
       max: 1,
       prepare: false,
       ssl: url.includes("localhost") ? false : "require",
+      ...(schema ? { connection: { search_path: schema } } : {}),
     });
   }
   return client;
@@ -23,6 +34,8 @@ async function ensureSchema() {
   if (!schemaReady) {
     schemaReady = (async () => {
       const sql = sqlClient();
+      const schema = databaseSchema();
+      if (schema) await sql`create schema if not exists ${sql(schema)}`;
       await sql`
         create table if not exists consultation_dossiers (
           id text primary key,

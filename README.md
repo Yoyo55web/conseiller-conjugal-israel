@@ -11,6 +11,7 @@ GitHub.
 
 ```bash
 DATABASE_URL=postgresql://...
+DATABASE_SCHEMA=conseiller_conjugal
 DATA_ENCRYPTION_KEY=une-cle-aleatoire-longue-et-unique
 ADMIN_PASSWORD=un-mot-de-passe-administrateur-long-et-unique
 ADMIN_SESSION_SECRET=une-seconde-cle-aleatoire-longue-et-unique
@@ -23,6 +24,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 La base recommandée est une base Neon PostgreSQL créée spécialement pour ce site depuis
 Vercel Marketplace. Le schéma est créé automatiquement lors du premier accès. Les réponses,
 les avis et les jetons de liens privés sont chiffrés côté application avant enregistrement.
+`DATABASE_SCHEMA` est facultative ; attribuez un schéma distinct à chaque Preview pour isoler
+ses données, même lorsqu’une branche Neon a été créée à partir d’une base existante.
 
 L’espace du conseiller est accessible sur `/admin`. Il permet de créer un dossier, de copier
 le lien de préparation et le lien d’avis, de consulter les réponses et de valider explicitement
