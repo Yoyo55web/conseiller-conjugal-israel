@@ -5,9 +5,9 @@ et espace d’administration protégé.
 
 ## Configuration privée
 
-Les fonctionnalités de dossier nécessitent une base PostgreSQL dédiée et quatre variables
-d’environnement. Elles doivent être enregistrées dans Vercel (Production et Preview) et ne
-jamais être ajoutées au dépôt GitHub.
+Les fonctionnalités de dossier nécessitent une base PostgreSQL dédiée. Les variables
+d’environnement doivent être enregistrées dans Vercel et ne jamais être ajoutées au dépôt
+GitHub.
 
 ```bash
 DATABASE_URL=postgresql://...
@@ -15,6 +15,9 @@ DATA_ENCRYPTION_KEY=une-cle-aleatoire-longue-et-unique
 ADMIN_PASSWORD=un-mot-de-passe-administrateur-long-et-unique
 ADMIN_SESSION_SECRET=une-seconde-cle-aleatoire-longue-et-unique
 NEXT_PUBLIC_SITE_URL=https://www.conseiller-conjugal-israel.com
+STRIPE_SECRET_KEY=rk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 La base recommandée est une base Neon PostgreSQL créée spécialement pour ce site depuis
@@ -25,7 +28,17 @@ L’espace du conseiller est accessible sur `/admin`. Il permet de créer un dos
 le lien de préparation et le lien d’avis, de consulter les réponses et de valider explicitement
 un témoignage avant son éventuelle publication.
 
-Stripe et le paiement en ligne ne font pas partie de cette version.
+## Paiement Stripe
+
+Le parcours privé enregistre le moyen de paiement au moyen d’un SetupIntent, sans débit.
+Après la séance uniquement, l’administrateur peut déclencher le montant expressément accepté ;
+le règlement est alors créé comme PaymentIntent hors session. Les événements Stripe sont reçus
+sur `/api/stripe/webhook`, vérifiés par leur signature et dédupliqués en base.
+
+Pour les déploiements Preview, utiliser exclusivement le compte Stripe test et limiter les
+variables à la branche concernée. L’application refuse automatiquement une clé Stripe réelle
+quand `VERCEL_ENV=preview`. La clé serveur recommandée est une clé restreinte donnant seulement
+les droits nécessaires sur Customers, SetupIntents, PaymentMethods et PaymentIntents.
 
 ## Getting Started
 
@@ -45,19 +58,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically load Geist, a font family for Vercel.
 
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Learn Next.js](https://nextjs.org/learn) - learn Next.js with an interactive tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js).
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The easiest way to deploy this Next.js app is to use the Vercel Git integration.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for details.
