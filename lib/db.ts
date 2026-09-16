@@ -19,15 +19,24 @@ function sqlClient() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL n’est pas configurée.");
   if (!client) {
-    const schema = databaseSchema();
     client = postgres(url, {
       max: 1,
       prepare: false,
       ssl: url.includes("localhost") ? false : "require",
-      ...(schema ? { connection: { search_path: schema } } : {}),
     });
   }
   return client;
+}
+
+type TableName =
+  | "consultation_dossiers"
+  | "consultation_feedback"
+  | "stripe_webhook_events";
+
+function table(name: TableName) {
+  const sql = sqlClient();
+  const schema = databaseSchema();
+  return schema ? sql`${sql(schema)}.${sql(name)}` : sql`${sql(name)}`;
 }
 
 async function ensureSchema() {
@@ -37,7 +46,7 @@ async function ensureSchema() {
       const schema = databaseSchema();
       if (schema) await sql`create schema if not exists ${sql(schema)}`;
       await sql`
-        create table if not exists consultation_dossiers (
+        create table if not exists ${table("consultation_dossiers")} (
           id text primary key,
           label text not null,
           consultation_type text not null default 'couple',
@@ -54,11 +63,11 @@ async function ensureSchema() {
         )
       `;
       await sql`
-        alter table consultation_dossiers
+        alter table ${table("consultation_dossiers")}
         add column if not exists consultation_type text not null default 'couple'
       `;
       await sql`
-        alter table consultation_dossiers
+        alter table ${table("consultation_dossiers")}
           add column if not exists stripe_customer_id text,
           add column if not exists stripe_setup_intent_id text,
           add column if not exists stripe_payment_method_id text,
@@ -78,12 +87,12 @@ async function ensureSchema() {
           add column if not exists payment_attempt_count integer not null default 0,
           add column if not exists payment_last_error text
       `;
-      await sql`create index if not exists consultation_dossiers_setup_intent_idx on consultation_dossiers(stripe_setup_intent_id)`;
-      await sql`create index if not exists consultation_dossiers_payment_intent_idx on consultation_dossiers(stripe_payment_intent_id)`;
+      await sql`create index if not exists consultation_dossiers_setup_intent_idx on ${table("consultation_dossiers")}(stripe_setup_intent_id)`;
+      await sql`create index if not exists consultation_dossiers_payment_intent_idx on ${table("consultation_dossiers")}(stripe_payment_intent_id)`;
       await sql`
-        create table if not exists consultation_feedback (
+        create table if not exists ${table("consultation_feedback")} (
           id text primary key,
-          dossier_id text not null references consultation_dossiers(id) on delete cascade,
+          dossier_id text not null references ${table("consultation_dossiers")}(id) on delete cascade,
           feedback_cipher text not null,
           publication_choice text not null default 'private',
           publication_approved boolean not null default false,
@@ -91,9 +100,9 @@ async function ensureSchema() {
           updated_at timestamptz not null default now()
         )
       `;
-      await sql`create index if not exists consultation_feedback_dossier_idx on consultation_feedback(dossier_id)`;
+      await sql`create index if not exists consultation_feedback_dossier_idx on ${table("consultation_feedback")}(dossier_id)`;
       await sql`
-        create table if not exists stripe_webhook_events (
+        create table if not exists ${table("stripe_webhook_events")} (
           event_id text primary key,
           event_type text not null,
           processed_at timestamptz not null default now()
@@ -257,7 +266,7 @@ export async function createDossier(input: {
   const intakeToken = newPrivateToken();
   const feedbackToken = newPrivateToken();
   await sql`
-    insert into consultation_dossiers (
+    insert into ${table("consultation_dossiers")} (
       id, label, consultation_type, appointment_at, appointment_mode,
       intake_token_hash, intake_token_cipher,
       feedback_token_hash, feedback_token_cipher
@@ -274,8 +283,8 @@ export async function listDossiers() {
   await ensureSchema();
   const rows = await sqlClient()`
     select d.*,
-      (select count(*)::int from consultation_feedback f where f.dossier_id = d.id) as feedback_count
-    from consultation_dossiers d
+      (select count(*)::int from ${table("consultation_feedback")} f where f.dossier_id = d.id) as feedback_count
+    from ${table("consultation_dossiers")} d
     order by d.created_at desc
   `;
   return rows.map((row) => ({
@@ -300,7 +309,7 @@ export async function findDossierByIntakeToken(token: string) {
   await ensureSchema();
   const rows = await sqlClient()`
     select *
-    from consultation_dossiers where intake_token_hash = ${hashToken(token)} limit 1
+    from ${table("consultation_dossiers")} where intake_token_hash = ${hashToken(token)} limit 1
   `;
   const row = rows[0];
   if (!row) return null;
@@ -321,7 +330,7 @@ export async function findDossierByIntakeToken(token: string) {
 export async function saveIntake(token: string, data: IntakeData) {
   await ensureSchema();
   const rows = await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set intake_cipher = ${encryptValue(data)}, intake_completed_at = now(), updated_at = now()
     where intake_token_hash = ${hashToken(token)} and intake_completed_at is null
     returning id
@@ -332,7 +341,7 @@ export async function saveIntake(token: string, data: IntakeData) {
 export async function findDossierByFeedbackToken(token: string) {
   await ensureSchema();
   const rows = await sqlClient()`
-    select id, label from consultation_dossiers
+    select id, label from ${table("consultation_dossiers")}
     where feedback_token_hash = ${hashToken(token)} limit 1
   `;
   return rows[0] ? { id: String(rows[0].id), label: String(rows[0].label) } : null;
@@ -343,7 +352,7 @@ export async function saveFeedback(token: string, data: FeedbackData) {
   const dossier = await findDossierByFeedbackToken(token);
   if (!dossier) return false;
   await sqlClient()`
-    insert into consultation_feedback (
+    insert into ${table("consultation_feedback")} (
       id, dossier_id, feedback_cipher, publication_choice
     ) values (
       ${crypto.randomUUID()}, ${dossier.id}, ${encryptValue(data)}, ${data.publicationChoice}
@@ -355,8 +364,8 @@ export async function saveFeedback(token: string, data: FeedbackData) {
 export async function listFeedback() {
   await ensureSchema();
   const rows = await sqlClient()`
-    select f.*, d.label from consultation_feedback f
-    join consultation_dossiers d on d.id = f.dossier_id
+    select f.*, d.label from ${table("consultation_feedback")} f
+    join ${table("consultation_dossiers")} d on d.id = f.dossier_id
     order by f.submitted_at desc
   `;
   return rows.map((row) => ({
@@ -372,7 +381,7 @@ export async function listFeedback() {
 export async function setFeedbackApproval(id: string, approved: boolean) {
   await ensureSchema();
   await sqlClient()`
-    update consultation_feedback set publication_approved = ${approved}, updated_at = now()
+    update ${table("consultation_feedback")} set publication_approved = ${approved}, updated_at = now()
     where id = ${id}
   `;
 }
@@ -380,7 +389,7 @@ export async function setFeedbackApproval(id: string, approved: boolean) {
 export async function clearDossierIntake(id: string) {
   await ensureSchema();
   await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set intake_cipher = null,
         intake_completed_at = null,
         stripe_customer_id = null,
@@ -414,7 +423,7 @@ export async function savePendingPaymentSetup(input: {
 }) {
   await ensureSchema();
   const rows = await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set stripe_customer_id = ${input.customerId},
         stripe_setup_intent_id = ${input.setupIntentId},
         stripe_payment_method_id = null,
@@ -449,7 +458,7 @@ export async function markPaymentMethodReady(input: {
 }) {
   await ensureSchema();
   const rows = await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set stripe_payment_method_id = ${input.paymentMethodId},
         payment_status = 'ready',
         payment_method_ready_at = coalesce(payment_method_ready_at, now()),
@@ -474,7 +483,7 @@ export async function markPaymentSetupFailed(
 ) {
   await ensureSchema();
   await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set payment_status = 'failed', payment_last_error = ${message}, updated_at = now()
     where id = ${dossierId} and stripe_setup_intent_id = ${setupIntentId}
       and payment_status <> 'paid'
@@ -484,7 +493,7 @@ export async function markPaymentSetupFailed(
 export async function findDossierPaymentById(id: string) {
   await ensureSchema();
   const rows = await sqlClient()`
-    select * from consultation_dossiers where id = ${id} limit 1
+    select * from ${table("consultation_dossiers")} where id = ${id} limit 1
   `;
   const row = rows[0];
   if (!row) return null;
@@ -500,7 +509,7 @@ export async function findDossierPaymentById(id: string) {
 export async function reservePaymentCharge(id: string) {
   await ensureSchema();
   const rows = await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set payment_status = 'charge_pending',
         payment_attempt_count = payment_attempt_count + 1,
         payment_charge_requested_at = now(),
@@ -530,7 +539,7 @@ export async function setPaymentIntentOutcome(input: {
 }) {
   await ensureSchema();
   const rows = await sqlClient()`
-    update consultation_dossiers
+    update ${table("consultation_dossiers")}
     set stripe_payment_intent_id = coalesce(${input.paymentIntentId || null}, stripe_payment_intent_id),
         payment_status = ${input.status},
         payment_paid_at = case when ${input.status} = 'paid' then coalesce(payment_paid_at, now()) else payment_paid_at end,
@@ -547,7 +556,7 @@ export async function setPaymentIntentOutcome(input: {
 export async function beginStripeWebhookEvent(eventId: string, eventType: string) {
   await ensureSchema();
   const rows = await sqlClient()`
-    insert into stripe_webhook_events (event_id, event_type)
+    insert into ${table("stripe_webhook_events")} (event_id, event_type)
     values (${eventId}, ${eventType})
     on conflict (event_id) do nothing
     returning event_id
@@ -557,17 +566,17 @@ export async function beginStripeWebhookEvent(eventId: string, eventType: string
 
 export async function releaseStripeWebhookEvent(eventId: string) {
   await ensureSchema();
-  await sqlClient()`delete from stripe_webhook_events where event_id = ${eventId}`;
+  await sqlClient()`delete from ${table("stripe_webhook_events")} where event_id = ${eventId}`;
 }
 
 export async function deleteDossier(id: string) {
   await ensureSchema();
-  await sqlClient()`delete from consultation_dossiers where id = ${id}`;
+  await sqlClient()`delete from ${table("consultation_dossiers")} where id = ${id}`;
 }
 
 export async function deleteFeedback(id: string) {
   await ensureSchema();
-  await sqlClient()`delete from consultation_feedback where id = ${id}`;
+  await sqlClient()`delete from ${table("consultation_feedback")} where id = ${id}`;
 }
 
 export async function listPublicFeedback() {
@@ -576,7 +585,7 @@ export async function listPublicFeedback() {
     await ensureSchema();
     const rows = await sqlClient()`
       select feedback_cipher, publication_choice
-      from consultation_feedback
+      from ${table("consultation_feedback")}
       where publication_approved = true and publication_choice <> 'private'
       order by submitted_at desc
       limit 6
