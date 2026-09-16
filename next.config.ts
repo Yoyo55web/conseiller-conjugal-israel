@@ -8,10 +8,10 @@ const contentSecurityPolicy = [
   "object-src 'none'",
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://js.stripe.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com https://*.stripe.com",
+  "img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com https://*.stripe.com https://*.link.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://api.stripe.com https://r.stripe.com https://*.stripe.com",
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://*.stripe.com",
+  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://api.stripe.com https://r.stripe.com https://*.stripe.com https://*.link.com",
+  "frame-src https://js.stripe.com https://hooks.stripe.com https://*.stripe.com https://*.link.com",
   "upgrade-insecure-requests",
 ].join("; ");
 
