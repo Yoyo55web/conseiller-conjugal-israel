@@ -1,7 +1,7 @@
 export type PaymentPlan = "single" | "pack6";
 export type PaymentCurrency = "ils" | "eur";
 
-export const PAYMENT_TERMS_VERSION = "2026-09-16";
+export const PAYMENT_TERMS_VERSION = "2026-09-17";
 
 export const PAYMENT_OPTIONS = {
   single: {
@@ -10,8 +10,8 @@ export const PAYMENT_OPTIONS = {
     amounts: { ils: 25_000, eur: 7_500 },
   },
   pack6: {
-    label: "Pack de 6 séances",
-    shortLabel: "Pack 6 séances",
+    label: "Cycle initial de 6 séances",
+    shortLabel: "Cycle de 6 séances",
     amounts: { ils: 140_000, eur: 42_000 },
   },
 } as const;
@@ -39,15 +39,21 @@ export function formatPaymentAmount(amount: number, currency: PaymentCurrency) {
 export function paymentAuthorizationText(
   plan: PaymentPlan,
   currency: PaymentCurrency,
+  purpose: "initial" | "continuation" = "initial",
 ) {
   const amount = paymentAmount(plan, currency);
   const formatted = formatPaymentAmount(amount, currency);
-  const timing = plan === "pack6" ? "après la première séance" : "après la séance";
+  const label = plan === "pack6" && purpose === "continuation"
+    ? "Nouveau cycle de 6 séances"
+    : PAYMENT_OPTIONS[plan].label;
+  const timing = plan === "pack6"
+    ? "après la première séance de ce cycle"
+    : "après la séance concernée";
 
   return [
-    `Je choisis : ${PAYMENT_OPTIONS[plan].label}, au montant de ${formatted}.`,
+    `Je choisis : ${label}, au montant de ${formatted}.`,
     `J’autorise Conseiller conjugal Israël à débiter ce montant uniquement ${timing}.`,
-    "Aucun montant n’est débité lors de l’enregistrement du moyen de paiement.",
-    "Il ne s’agit pas d’un abonnement et aucun renouvellement automatique ne sera effectué.",
+    "Cette autorisation concerne uniquement la formule et le montant indiqués ci-dessus.",
+    "Il ne s’agit pas d’un abonnement : aucun renouvellement ni débit supplémentaire ne sera effectué automatiquement.",
   ].join("\n");
 }

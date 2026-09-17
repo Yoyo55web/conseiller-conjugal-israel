@@ -16,6 +16,7 @@ export async function finalizeSetupIntent(setupIntent: Stripe.SetupIntent) {
   const dossierId = setupIntent.metadata?.dossier_id;
   const paymentMethodId = objectId(setupIntent.payment_method);
   const customerId = objectId(setupIntent.customer);
+  const paymentCycleId = setupIntent.metadata?.payment_cycle_id || null;
   if (!dossierId || !paymentMethodId || !customerId || setupIntent.status !== "succeeded") {
     return false;
   }
@@ -24,7 +25,8 @@ export async function finalizeSetupIntent(setupIntent: Stripe.SetupIntent) {
   if (
     !dossier ||
     dossier.payment.stripeSetupIntentId !== setupIntent.id ||
-    dossier.payment.stripeCustomerId !== customerId
+    dossier.payment.stripeCustomerId !== customerId ||
+    (dossier.payment.cycleId !== null && dossier.payment.cycleId !== paymentCycleId)
   ) {
     return false;
   }
@@ -59,12 +61,16 @@ export async function synchronizePaymentIntent(paymentIntent: Stripe.PaymentInte
 
   const dossier = await findDossierPaymentById(dossierId);
   const attempt = Number(paymentIntent.metadata?.charge_attempt);
+  const paymentCycleId = paymentIntent.metadata?.payment_cycle_id || null;
   const customerId = objectId(paymentIntent.customer);
   if (
     !dossier ||
     !Number.isInteger(attempt) ||
     attempt < 1 ||
     attempt !== dossier.payment.attemptCount ||
+    (dossier.payment.cycleId
+      ? paymentCycleId !== dossier.payment.cycleId
+      : paymentCycleId !== null && paymentCycleId !== "legacy") ||
     !customerId ||
     customerId !== dossier.payment.stripeCustomerId ||
     paymentIntent.amount !== dossier.payment.amount ||

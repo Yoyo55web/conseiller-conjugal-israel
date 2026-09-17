@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { listDossiers, listFeedback, type IntakeData } from "@/lib/db";
 import type { ConsultationType } from "@/lib/consultation-framework";
-import { formatPaymentAmount, PAYMENT_OPTIONS } from "@/lib/payment-config";
+import { formatPaymentAmount, PAYMENT_OPTIONS, type PaymentPlan } from "@/lib/payment-config";
 import {
   approveFeedbackAction,
   chargeDossierPaymentAction,
@@ -12,6 +12,7 @@ import {
   deleteDossierAction,
   deleteFeedbackAction,
   logoutAction,
+  updateDossierAppointmentAction,
 } from "./actions";
 import CopyLink from "./CopyLink";
 import ConfirmActionButton from "./ConfirmActionButton";
@@ -37,6 +38,20 @@ function formatDate(value?: string | null, dateOnly = false) {
   });
 }
 
+function formatDateTimeInput(value?: string | null) {
+  if (!value) return "";
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jerusalem",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(value)).map(({ type, value: part }) => [type, part]));
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+}
+
 function proofValue(value: boolean | undefined) {
   return value === undefined ? "Non enregistré séparément dans cette ancienne version" : value ? "Oui" : "Non";
 }
@@ -51,6 +66,12 @@ function paymentStatusLabel(status: string) {
     case "failed": return "Échec à vérifier";
     default: return "Moyen de paiement non enregistré";
   }
+}
+
+function paymentChoiceLabel(plan: PaymentPlan, purpose?: "initial" | "continuation") {
+  return plan === "pack6" && purpose === "continuation"
+    ? "Nouveau cycle de 6 séances"
+    : PAYMENT_OPTIONS[plan].label;
 }
 
 function IntakeSummary({ intake, type }: { intake: IntakeData; type: ConsultationType }) {
@@ -123,10 +144,10 @@ function IntakeSummary({ intake, type }: { intake: IntakeData; type: Consultatio
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ creation?: string; erreur?: string; suppression?: string; paiement?: string; prochain?: string }>;
+  searchParams: Promise<{ creation?: string; erreur?: string; suppression?: string; paiement?: string; prochain?: string; rendezvous?: string }>;
 }) {
   if (!(await isAdminAuthenticated())) redirect("/admin/login");
-  const [{ creation, erreur, suppression, paiement, prochain }, dossiers, feedback] = await Promise.all([
+  const [{ creation, erreur, suppression, paiement, prochain, rendezvous }, dossiers, feedback] = await Promise.all([
     searchParams,
     listDossiers(),
     listFeedback(),
@@ -159,6 +180,11 @@ export default async function AdminPage({
               : suppression === "avis"
                 ? "L’avis a été supprimé."
                 : "Le dossier et toutes les données associées ont été supprimés."}
+          </p>
+        ) : null}
+        {rendezvous ? (
+          <p className="rounded-xl bg-green-50 p-4 text-sm text-green-900">
+            La date de la prochaine séance a été mise à jour.
           </p>
         ) : null}
         {erreur ? (
@@ -252,6 +278,22 @@ export default async function AdminPage({
                   <CopyLink label="Lien de préparation" value={intakeUrl} />
                   <CopyLink label="Lien d’avis après l’accompagnement" value={feedbackUrl} />
                 </div>
+                <form action={updateDossierAppointmentAction} className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border bg-gray-50 p-4">
+                  <input type="hidden" name="id" value={dossier.id} />
+                  <label className="min-w-64 flex-1 text-sm font-medium">
+                    Prochaine séance à encaisser
+                    <input
+                      name="appointmentAt"
+                      type="datetime-local"
+                      defaultValue={formatDateTimeInput(dossier.appointmentAt)}
+                      required
+                      className="mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal"
+                    />
+                  </label>
+                  <button className="rounded-xl border bg-white px-4 py-3 text-sm font-semibold">
+                    Mettre à jour la date
+                  </button>
+                </form>
                 <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
@@ -264,12 +306,12 @@ export default async function AdminPage({
                   </div>
                   {dossier.payment.plan && dossier.payment.currency && dossier.payment.amount !== null ? (
                     <div className="mt-3 grid gap-2 md:grid-cols-2">
-                      <p><strong>Choix :</strong> {PAYMENT_OPTIONS[dossier.payment.plan].label}</p>
+                      <p><strong>Choix :</strong> {paymentChoiceLabel(dossier.payment.plan, dossier.payment.authorization?.purpose)}</p>
                       <p><strong>Montant autorisé :</strong> {formatPaymentAmount(dossier.payment.amount, dossier.payment.currency)}</p>
                       {dossier.payment.authorization ? (
                         <>
                           <p><strong>Titulaire :</strong> {dossier.payment.authorization.cardholderName}</p>
-                          <p><strong>Email du reçu :</strong> {dossier.payment.authorization.receiptEmail}</p>
+                          <p><strong>Email du reçu de paiement :</strong> {dossier.payment.authorization.receiptEmail}</p>
                           <p><strong>Autorisation horodatée :</strong> {formatDate(dossier.payment.authorization.consentAt)}</p>
                           <p><strong>Version :</strong> {dossier.payment.authorization.termsVersion}</p>
                           <details className="md:col-span-2 rounded-lg border border-blue-100 bg-white p-3">
@@ -278,6 +320,10 @@ export default async function AdminPage({
                             <code className="mt-3 block break-all text-xs text-gray-500">Empreinte : {dossier.payment.authorization.termsDigest}</code>
                           </details>
                         </>
+                      ) : null}
+                      {dossier.payment.paidAt ? <p><strong>Réglé le :</strong> {formatDate(dossier.payment.paidAt)}</p> : null}
+                      {dossier.payment.stripePaymentIntentId ? (
+                        <p className="break-all"><strong>Référence Stripe :</strong> {dossier.payment.stripePaymentIntentId}</p>
                       ) : null}
                     </div>
                   ) : null}
@@ -299,6 +345,26 @@ export default async function AdminPage({
                     <div className="mt-3">
                       <CopyLink label="Lien à renvoyer pour la vérification Stripe" value={`${intakeUrl}/paiement`} />
                     </div>
+                  ) : null}
+                  {dossier.paymentHistory.length > 0 ? (
+                    <details className="mt-4 rounded-lg border border-blue-100 bg-white p-3">
+                      <summary className="cursor-pointer font-medium">
+                        Règlements précédents ({dossier.paymentHistory.length})
+                      </summary>
+                      <div className="mt-3 space-y-3">
+                        {dossier.paymentHistory.map((item) => (
+                          <div key={item.id} className="rounded-lg border p-3 text-sm">
+                            <p>
+                              <strong>{paymentChoiceLabel(item.plan, item.authorization.purpose)}</strong> · {formatPaymentAmount(item.amount, item.currency)}
+                            </p>
+                            <p className="mt-1 text-gray-600">
+                              Réglé le {formatDate(item.paidAt)} · reçu envoyé à {item.authorization.receiptEmail}
+                            </p>
+                            <p className="mt-1 break-all text-xs text-gray-500">Stripe : {item.stripePaymentIntentId}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
                   ) : null}
                 </div>
                 {dossier.intake ? (

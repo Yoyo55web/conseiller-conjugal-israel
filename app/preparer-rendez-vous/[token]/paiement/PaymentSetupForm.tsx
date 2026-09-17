@@ -228,6 +228,11 @@ export default function PaymentSetupForm({
                 />
                 <span>
                   <strong className="block">{PAYMENT_OPTIONS[value].label}</strong>
+                  {value === "pack6" ? (
+                    <span className="mt-1 inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-900">
+                      Cycle recommandé
+                    </span>
+                  ) : null}
                   <span className="mt-1 block text-sm text-gray-600">
                     {value === "single"
                       ? "250 ₪ ou 75 €"
@@ -235,7 +240,8 @@ export default function PaymentSetupForm({
                   </span>
                   {value === "pack6" ? (
                     <span className="mt-2 block text-sm leading-relaxed text-gray-700">
-                      Un minimum de six séances permet généralement d’effectuer un travail plus approfondi.
+                      Ce cycle permet d’aller au-delà du premier constat et d’engager un travail
+                      approfondi. À son terme, la suite est décidée librement selon vos besoins.
                     </span>
                   ) : null}
                 </span>
@@ -269,7 +275,7 @@ export default function PaymentSetupForm({
           <input className={inputClass} name="cardholderName" autoComplete="cc-name" required />
         </label>
         <label className="text-sm font-medium">
-          Email pour le reçu
+          Email pour le reçu de paiement
           <input className={inputClass} name="receiptEmail" type="email" defaultValue={defaultEmail} autoComplete="email" required />
         </label>
       </div>
@@ -281,10 +287,7 @@ export default function PaymentSetupForm({
 
       <label className="flex items-start gap-3 rounded-2xl border bg-white p-5 text-sm leading-relaxed">
         <input className="mt-1 h-4 w-4 shrink-0" type="checkbox" name="consent" required />
-        <span>
-          Je confirme avoir lu et accepté l’autorisation ci-dessus. Je comprends que
-          <strong> rien ne sera débité avant la séance</strong>.
-        </span>
+        <span>Je confirme avoir lu et accepté l’autorisation ci-dessus.</span>
       </label>
 
       {status === "error" ? (

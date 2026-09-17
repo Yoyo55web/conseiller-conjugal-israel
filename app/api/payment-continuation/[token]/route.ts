@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { findDossierByIntakeToken, savePendingPaymentSetup } from "@/lib/db";
+import { findDossierByIntakeToken, startPaymentContinuation } from "@/lib/db";
 import {
   isPaymentCurrency,
   isPaymentPlan,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/payment-config";
 import { paymentWindowStatus } from "@/lib/payment-window";
 import { requestHasExpectedOrigin } from "@/lib/request-security";
-import { getStripe, stripeConfigured, stripePublishableKey } from "@/lib/stripe";
+import { getStripe, stripeConfigured } from "@/lib/stripe";
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
@@ -37,24 +37,27 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     const paymentWindow = paymentWindowStatus();
     if (paymentWindow.blocked) {
       return Response.json({
-        error: "L’enregistrement du moyen de paiement est momentanément suspendu pour Chabbat ou Yom Tov.",
+        error: "L’autorisation est momentanément suspendue pour Chabbat ou Yom Tov.",
         nextAllowedAt: paymentWindow.nextAllowedAt,
       }, { status: 423 });
     }
-
     if (Number(request.headers.get("content-length") || 0) > 12_000) {
       return Response.json({ error: "La demande est trop volumineuse." }, { status: 413 });
     }
 
     const dossier = await findDossierByIntakeToken(token);
     if (!dossier || !dossier.intakeCompletedAt) {
-      return Response.json({ error: "Le formulaire doit d’abord être complété." }, { status: 409 });
-    }
-    if (dossier.payment.status === "paid") {
-      return Response.json({ error: "Ce règlement a déjà été effectué." }, { status: 409 });
+      return Response.json({ error: "Ce dossier n’est pas disponible." }, { status: 404 });
     }
     if (dossier.payment.status === "ready") {
-      return Response.json({ alreadyReady: true });
+      return Response.json({ alreadyReady: true }, { headers: { "Cache-Control": "no-store" } });
+    }
+    if (
+      dossier.payment.status !== "paid" ||
+      !dossier.payment.stripeCustomerId ||
+      !dossier.payment.stripePaymentMethodId
+    ) {
+      return Response.json({ error: "La poursuite ne peut pas encore être autorisée." }, { status: 409 });
     }
 
     const body = await request.json() as Record<string, unknown>;
@@ -69,66 +72,27 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
       return Response.json({ error: "Veuillez vérifier le nom et l’adresse email du titulaire." }, { status: 400 });
     }
     if (body.consent !== true) {
-      return Response.json({ error: "Votre autorisation est nécessaire pour enregistrer le moyen de paiement." }, { status: 400 });
+      return Response.json({ error: "Votre nouvelle autorisation est nécessaire." }, { status: 400 });
     }
 
     const amount = paymentAmount(plan, currency);
-    const termsSnapshot = paymentAuthorizationText(plan, currency);
+    const termsSnapshot = paymentAuthorizationText(plan, currency, "continuation");
     const consentAt = new Date().toISOString();
     const cycleId = crypto.randomUUID();
-    const stripe = getStripe();
+    await getStripe().customers.update(dossier.payment.stripeCustomerId, {
+      name: cardholderName,
+      email: receiptEmail,
+      invoice_settings: { default_payment_method: dossier.payment.stripePaymentMethodId },
+    });
 
-    let customerId = dossier.payment.stripeCustomerId;
-    if (customerId) {
-      try {
-        const customer = await stripe.customers.retrieve(customerId);
-        if (customer.deleted) customerId = null;
-      } catch {
-        customerId = null;
-      }
-    }
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        name: cardholderName,
-        email: receiptEmail,
-        metadata: {
-          dossier_id: dossier.id,
-          source: "private_intake",
-        },
-      }, { idempotencyKey: `dossier-customer-${dossier.id}` });
-      customerId = customer.id;
-    }
-
-    const setupIntent = await stripe.setupIntents.create({
-      customer: customerId,
-      usage: "off_session",
-      automatic_payment_methods: { enabled: true },
-      description: `${dossier.label} — enregistrement sécurisé du moyen de paiement`,
-      metadata: {
-        dossier_id: dossier.id,
-        plan,
-        currency,
-        amount: String(amount),
-        payment_cycle_id: cycleId,
-        terms_version: PAYMENT_TERMS_VERSION,
-        consent_at: consentAt,
-      },
-    }, { idempotencyKey: `setup-${dossier.id}-${plan}-${currency}-${Date.now()}` });
-
-    if (!setupIntent.client_secret) {
-      return Response.json({ error: "Stripe n’a pas pu initialiser l’enregistrement." }, { status: 502 });
-    }
-
-    const savedDossierId = await savePendingPaymentSetup({
+    const savedDossierId = await startPaymentContinuation({
       token,
-      customerId,
-      setupIntentId: setupIntent.id,
       cycleId,
       authorization: {
         plan,
         currency,
         amount,
-        purpose: "initial",
+        purpose: "continuation",
         cardholderName,
         receiptEmail,
         consentAt,
@@ -138,15 +102,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
       },
     });
     if (!savedDossierId) {
-      await stripe.setupIntents.cancel(setupIntent.id).catch(() => undefined);
-      return Response.json({ error: "Cette demande ne peut plus être modifiée." }, { status: 409 });
+      return Response.json({ error: "Cette autorisation a déjà été remplacée ou n’est plus disponible." }, { status: 409 });
     }
 
-    return Response.json({
-      clientSecret: setupIntent.client_secret,
-      publishableKey: stripePublishableKey(),
-      setupIntentId: setupIntent.id,
-    }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ error: "Le service Stripe est momentanément indisponible." }, { status: 503 });
   }

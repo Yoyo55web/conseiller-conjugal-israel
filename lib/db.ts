@@ -30,6 +30,7 @@ function sqlClient() {
 
 type TableName =
   | "consultation_dossiers"
+  | "consultation_payment_history"
   | "consultation_feedback"
   | "stripe_webhook_events";
 
@@ -72,6 +73,7 @@ async function ensureSchema() {
           add column if not exists stripe_setup_intent_id text,
           add column if not exists stripe_payment_method_id text,
           add column if not exists stripe_payment_intent_id text,
+          add column if not exists payment_cycle_id text,
           add column if not exists payment_plan text,
           add column if not exists payment_currency text,
           add column if not exists payment_amount integer,
@@ -89,6 +91,21 @@ async function ensureSchema() {
       `;
       await sql`create index if not exists consultation_dossiers_setup_intent_idx on ${table("consultation_dossiers")}(stripe_setup_intent_id)`;
       await sql`create index if not exists consultation_dossiers_payment_intent_idx on ${table("consultation_dossiers")}(stripe_payment_intent_id)`;
+      await sql`
+        create table if not exists ${table("consultation_payment_history")} (
+          id text primary key,
+          dossier_id text not null references ${table("consultation_dossiers")}(id) on delete cascade,
+          payment_cycle_id text,
+          stripe_payment_intent_id text not null unique,
+          payment_plan text not null,
+          payment_currency text not null,
+          payment_amount integer not null,
+          payment_authorization_cipher text not null,
+          payment_paid_at timestamptz not null,
+          created_at timestamptz not null default now()
+        )
+      `;
+      await sql`create index if not exists consultation_payment_history_dossier_idx on ${table("consultation_payment_history")}(dossier_id, payment_paid_at desc)`;
       await sql`
         create table if not exists ${table("consultation_feedback")} (
           id text primary key,
@@ -183,6 +200,7 @@ export type PaymentAuthorizationData = {
   plan: PaymentPlan;
   currency: PaymentCurrency;
   amount: number;
+  purpose?: "initial" | "continuation";
   cardholderName: string;
   receiptEmail: string;
   consentAt: string;
@@ -193,6 +211,7 @@ export type PaymentAuthorizationData = {
 
 export type DossierPayment = {
   status: PaymentStatus;
+  cycleId: string | null;
   plan: PaymentPlan | null;
   currency: PaymentCurrency | null;
   amount: number | null;
@@ -212,6 +231,17 @@ export type DossierPayment = {
   lastError: string | null;
 };
 
+export type PaymentHistoryItem = {
+  id: string;
+  cycleId: string | null;
+  stripePaymentIntentId: string;
+  plan: PaymentPlan;
+  currency: PaymentCurrency;
+  amount: number;
+  authorization: PaymentAuthorizationData;
+  paidAt: string;
+};
+
 function dateIso(value: unknown) {
   return value ? new Date(value as string | number | Date).toISOString() : null;
 }
@@ -226,6 +256,7 @@ function paymentFromRow(row: Record<string, unknown>): DossierPayment {
     status: validStatuses.has(rawStatus as PaymentStatus)
       ? rawStatus as PaymentStatus
       : "not_started",
+    cycleId: row.payment_cycle_id ? String(row.payment_cycle_id) : null,
     plan: row.payment_plan === "single" || row.payment_plan === "pack6"
       ? row.payment_plan
       : null,
@@ -251,6 +282,25 @@ function paymentFromRow(row: Record<string, unknown>): DossierPayment {
     paidAt: dateIso(row.payment_paid_at),
     attemptCount: Number(row.payment_attempt_count || 0),
     lastError: row.payment_last_error ? String(row.payment_last_error) : null,
+  };
+}
+
+function paymentHistoryFromRow(row: Record<string, unknown>): PaymentHistoryItem | null {
+  const authorization = decryptValue<PaymentAuthorizationData>(String(row.payment_authorization_cipher));
+  if (
+    !authorization ||
+    (row.payment_plan !== "single" && row.payment_plan !== "pack6") ||
+    (row.payment_currency !== "ils" && row.payment_currency !== "eur")
+  ) return null;
+  return {
+    id: String(row.id),
+    cycleId: row.payment_cycle_id ? String(row.payment_cycle_id) : null,
+    stripePaymentIntentId: String(row.stripe_payment_intent_id),
+    plan: row.payment_plan,
+    currency: row.payment_currency,
+    amount: Number(row.payment_amount),
+    authorization,
+    paidAt: new Date(row.payment_paid_at as string | number | Date).toISOString(),
   };
 }
 
@@ -281,12 +331,27 @@ export async function createDossier(input: {
 
 export async function listDossiers() {
   await ensureSchema();
-  const rows = await sqlClient()`
+  const sql = sqlClient();
+  const rows = await sql`
     select d.*,
       (select count(*)::int from ${table("consultation_feedback")} f where f.dossier_id = d.id) as feedback_count
     from ${table("consultation_dossiers")} d
     order by d.created_at desc
   `;
+  const historyRows = await sql`
+    select * from ${table("consultation_payment_history")}
+    order by payment_paid_at desc
+  `;
+  const paymentHistoryByDossier = new Map<string, PaymentHistoryItem[]>();
+  for (const historyRow of historyRows) {
+    const item = paymentHistoryFromRow(historyRow);
+    if (!item) continue;
+    const dossierId = String(historyRow.dossier_id);
+    paymentHistoryByDossier.set(dossierId, [
+      ...(paymentHistoryByDossier.get(dossierId) || []),
+      item,
+    ]);
+  }
   return rows.map((row) => ({
     id: String(row.id),
     label: String(row.label),
@@ -301,6 +366,7 @@ export async function listDossiers() {
     feedbackToken: decryptValue<string>(String(row.feedback_token_cipher))!,
     intake: decryptValue<IntakeData>(row.intake_cipher ? String(row.intake_cipher) : null),
     payment: paymentFromRow(row),
+    paymentHistory: paymentHistoryByDossier.get(String(row.id)) || [],
     feedbackCount: Number(row.feedback_count || 0),
   }));
 }
@@ -388,7 +454,8 @@ export async function setFeedbackApproval(id: string, approved: boolean) {
 
 export async function clearDossierIntake(id: string) {
   await ensureSchema();
-  await sqlClient()`
+  const sql = sqlClient();
+  await sql`
     update ${table("consultation_dossiers")}
     set intake_cipher = null,
         intake_completed_at = null,
@@ -396,6 +463,7 @@ export async function clearDossierIntake(id: string) {
         stripe_setup_intent_id = null,
         stripe_payment_method_id = null,
         stripe_payment_intent_id = null,
+        payment_cycle_id = null,
         payment_plan = null,
         payment_currency = null,
         payment_amount = null,
@@ -413,12 +481,25 @@ export async function clearDossierIntake(id: string) {
         updated_at = now()
     where id = ${id}
   `;
+  await sql`delete from ${table("consultation_payment_history")} where dossier_id = ${id}`;
+}
+
+export async function updateDossierAppointment(id: string, appointmentAt: string) {
+  await ensureSchema();
+  const rows = await sqlClient()`
+    update ${table("consultation_dossiers")}
+    set appointment_at = ${appointmentAt}, updated_at = now()
+    where id = ${id}
+    returning id
+  `;
+  return rows.length > 0;
 }
 
 export async function savePendingPaymentSetup(input: {
   token: string;
   customerId: string;
   setupIntentId: string;
+  cycleId: string;
   authorization: PaymentAuthorizationData;
 }) {
   await ensureSchema();
@@ -427,6 +508,7 @@ export async function savePendingPaymentSetup(input: {
     set stripe_customer_id = ${input.customerId},
         stripe_setup_intent_id = ${input.setupIntentId},
         stripe_payment_method_id = null,
+        payment_cycle_id = ${input.cycleId},
         payment_plan = ${input.authorization.plan},
         payment_currency = ${input.authorization.currency},
         payment_amount = ${input.authorization.amount},
@@ -443,6 +525,63 @@ export async function savePendingPaymentSetup(input: {
       and intake_completed_at is not null
       and payment_status <> 'paid'
     returning id
+  `;
+  return rows[0] ? String(rows[0].id) : null;
+}
+
+export async function startPaymentContinuation(input: {
+  token: string;
+  cycleId: string;
+  authorization: PaymentAuthorizationData;
+}) {
+  await ensureSchema();
+  const historyId = crypto.randomUUID();
+  const encryptedAuthorization = encryptValue(input.authorization);
+  const rows = await sqlClient()`
+    with archived as (
+      insert into ${table("consultation_payment_history")} (
+        id, dossier_id, payment_cycle_id, stripe_payment_intent_id,
+        payment_plan, payment_currency, payment_amount,
+        payment_authorization_cipher, payment_paid_at
+      )
+      select
+        ${historyId}, id, payment_cycle_id, stripe_payment_intent_id,
+        payment_plan, payment_currency, payment_amount,
+        payment_authorization_cipher, payment_paid_at
+      from ${table("consultation_dossiers")}
+      where intake_token_hash = ${hashToken(input.token)}
+        and intake_completed_at is not null
+        and payment_status = 'paid'
+        and stripe_customer_id is not null
+        and stripe_payment_method_id is not null
+        and stripe_payment_intent_id is not null
+        and payment_plan is not null
+        and payment_currency is not null
+        and payment_amount is not null
+        and payment_authorization_cipher is not null
+        and payment_paid_at is not null
+      on conflict (stripe_payment_intent_id) do update
+        set stripe_payment_intent_id = excluded.stripe_payment_intent_id
+      returning dossier_id
+    )
+    update ${table("consultation_dossiers")} as d
+    set appointment_at = null,
+        stripe_setup_intent_id = null,
+        stripe_payment_intent_id = null,
+        payment_cycle_id = ${input.cycleId},
+        payment_plan = ${input.authorization.plan},
+        payment_currency = ${input.authorization.currency},
+        payment_amount = ${input.authorization.amount},
+        payment_status = 'ready',
+        payment_authorization_cipher = ${encryptedAuthorization},
+        payment_charge_requested_at = null,
+        payment_paid_at = null,
+        payment_last_error = null,
+        updated_at = now()
+    where d.intake_token_hash = ${hashToken(input.token)}
+      and d.payment_status = 'paid'
+      and exists (select 1 from archived where archived.dossier_id = d.id)
+    returning d.id
   `;
   return rows[0] ? String(rows[0].id) : null;
 }

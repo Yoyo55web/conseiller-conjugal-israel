@@ -18,6 +18,7 @@ import {
   reservePaymentCharge,
   setFeedbackApproval,
   setPaymentIntentOutcome,
+  updateDossierAppointment,
 } from "@/lib/db";
 import type { ConsultationType } from "@/lib/consultation-framework";
 import { paymentWindowStatus } from "@/lib/payment-window";
@@ -102,6 +103,18 @@ export async function createDossierAction(formData: FormData) {
   await createDossier({ label, appointmentAt, appointmentMode, consultationType });
   revalidatePath("/admin");
   redirect("/admin?creation=ok");
+}
+
+export async function updateDossierAppointmentAction(formData: FormData) {
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+  const id = String(formData.get("id") || "");
+  const appointmentValue = String(formData.get("appointmentAt") || "").trim();
+  const appointmentAt = appointmentValue ? israelLocalDateTimeToIso(appointmentValue) : undefined;
+  if (!validId(id) || !appointmentAt) redirect("/admin?erreur=rendez-vous");
+  const updated = await updateDossierAppointment(id, appointmentAt);
+  if (!updated) redirect("/admin?erreur=rendez-vous");
+  revalidatePath("/admin");
+  redirect("/admin?rendezvous=ok");
 }
 
 export async function approveFeedbackAction(formData: FormData) {
@@ -206,10 +219,11 @@ export async function chargeDossierPaymentAction(formData: FormData) {
       off_session: true,
       confirm: true,
       receipt_email: authorization.receiptEmail,
-      description: `${reserved.label} — ${payment.plan === "pack6" ? "pack de 6 séances" : "séance"}`,
+      description: `${reserved.label} — ${payment.plan === "pack6" ? "cycle de 6 séances" : "séance"}`,
       metadata: {
         dossier_id: id,
         plan: payment.plan || "single",
+        payment_cycle_id: payment.cycleId || "legacy",
         charge_attempt: String(attempt),
         charged_after_session: "true",
       },

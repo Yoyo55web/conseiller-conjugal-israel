@@ -38,6 +38,16 @@ Après la séance uniquement, l’administrateur peut déclencher le montant exp
 le règlement est alors créé comme PaymentIntent hors session. Les événements Stripe sont reçus
 sur `/api/stripe/webhook`, vérifiés par leur signature et dédupliqués en base.
 
+Après un règlement, le même lien privé peut servir à autoriser explicitement une séance
+supplémentaire ou un nouveau cycle de six séances. La carte n’est pas ressaisie, mais aucune
+poursuite n’est automatique : une nouvelle autorisation est archivée et l’administrateur doit
+renseigner la date de la prochaine séance avant de pouvoir encaisser. Chaque règlement conserve
+sa référence Stripe et sa preuve d’autorisation dans l’historique du dossier.
+
+L’adresse `receipt_email` est transmise à Stripe lors de chaque PaymentIntent afin que Stripe
+envoie automatiquement un reçu de paiement en mode Live. Ce reçu Stripe ne remplace pas, à lui
+seul, une facture fiscale si une facture conforme à la réglementation applicable est requise.
+
 Pour les déploiements Preview, utiliser exclusivement le compte Stripe test et limiter les
 variables à la branche concernée. L’application refuse automatiquement une clé Stripe réelle
 quand `VERCEL_ENV=preview`. La clé serveur recommandée est une clé restreinte donnant seulement
