@@ -62,7 +62,6 @@ export default function ConfirmActionButton({
               </button>
               <button
                 type="submit"
-                onClick={() => setConfirmationOpen(false)}
                 className={tone === "danger"
                   ? "rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-800"
                   : "rounded-lg bg-amber-700 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-800"}
