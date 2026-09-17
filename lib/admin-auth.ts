@@ -4,13 +4,6 @@ import { cookies } from "next/headers";
 const COOKIE_NAME = "cc_admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 12;
 
-function temporaryPreviewAdminBypassEnabled() {
-  return (
-    process.env.VERCEL_ENV === "preview" &&
-    process.env.VERCEL_GIT_COMMIT_REF === "codex/stripe-payment-setup"
-  );
-}
-
 export function privateFeaturesConfigured() {
   return Boolean(
     process.env.DATABASE_URL &&
@@ -58,10 +51,6 @@ export async function clearAdminSession() {
 }
 
 export async function isAdminAuthenticated() {
-  // Contournement strictement temporaire pour les tests E2E de la Preview.
-  // À supprimer et redéployer avant toute promotion en production.
-  if (temporaryPreviewAdminBypassEnabled()) return true;
-
   try {
     const token = (await cookies()).get(COOKIE_NAME)?.value;
     if (!token) return false;
