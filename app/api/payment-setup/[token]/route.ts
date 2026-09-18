@@ -91,6 +91,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
       const customer = await stripe.customers.create({
         name: cardholderName,
         email: receiptEmail,
+        preferred_locales: ["fr"],
         metadata: {
           dossier_id: dossier.id,
           source: "private_intake",
