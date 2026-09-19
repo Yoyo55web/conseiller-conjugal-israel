@@ -22,15 +22,21 @@ const inputClass =
 function UnifiedPaymentForm({
   token,
   defaultEmail,
+  plan,
+  currency,
+  onPlanChange,
+  onCurrencyChange,
 }: {
   token: string;
   defaultEmail: string;
+  plan: PaymentPlan;
+  currency: PaymentCurrency;
+  onPlanChange: (plan: PaymentPlan) => void;
+  onCurrencyChange: (currency: PaymentCurrency) => void;
 }) {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
-  const [plan, setPlan] = useState<PaymentPlan>("single");
-  const [currency, setCurrency] = useState<PaymentCurrency>("ils");
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -140,7 +146,7 @@ function UnifiedPaymentForm({
                   name="plan"
                   value={value}
                   checked={plan === value}
-                  onChange={() => setPlan(value)}
+                  onChange={() => onPlanChange(value)}
                 />
                 <span>
                   <strong className="block">{PAYMENT_OPTIONS[value].label}</strong>
@@ -177,7 +183,7 @@ function UnifiedPaymentForm({
                 name="currency"
                 value={value}
                 checked={currency === value}
-                onChange={() => setCurrency(value)}
+                onChange={() => onCurrencyChange(value)}
               />
               <span>{value === "ils" ? "Shekels (₪)" : "Euros (€)"}</span>
             </label>
@@ -251,12 +257,16 @@ export default function PaymentSetupForm({
   publishableKey: string;
 }) {
   const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
+  const [plan, setPlan] = useState<PaymentPlan>("single");
+  const [currency, setCurrency] = useState<PaymentCurrency>("ils");
 
   return (
     <Elements
+      key={currency}
       stripe={stripePromise}
       options={{
         mode: "setup",
+        currency,
         setupFutureUsage: "off_session",
         allowedPaymentMethodTypes: ["card"],
         locale: "fr",
@@ -266,7 +276,14 @@ export default function PaymentSetupForm({
         },
       }}
     >
-      <UnifiedPaymentForm token={token} defaultEmail={defaultEmail} />
+      <UnifiedPaymentForm
+        token={token}
+        defaultEmail={defaultEmail}
+        plan={plan}
+        currency={currency}
+        onPlanChange={setPlan}
+        onCurrencyChange={setCurrency}
+      />
     </Elements>
   );
 }
