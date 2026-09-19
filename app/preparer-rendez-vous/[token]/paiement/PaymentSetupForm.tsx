@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Elements,
@@ -8,11 +8,9 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import {
-  formatPaymentAmount,
   PAYMENT_OPTIONS,
-  paymentAmount,
   paymentAuthorizationText,
   type PaymentCurrency,
   type PaymentPlan,
@@ -21,103 +19,7 @@ import {
 const inputClass =
   "mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-950 outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700/20";
 
-type StripeSetup = {
-  clientSecret: string;
-  setupIntentId: string;
-  stripePromise: Promise<Stripe | null>;
-  cardholderName: string;
-  receiptEmail: string;
-};
-
-function SecurePaymentElement({
-  token,
-  setupIntentId,
-  cardholderName,
-  receiptEmail,
-}: {
-  token: string;
-  setupIntentId: string;
-  cardholderName: string;
-  receiptEmail: string;
-}) {
-  const router = useRouter();
-  const stripe = useStripe();
-  const elements = useElements();
-  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
-  const [message, setMessage] = useState("");
-
-  async function confirm(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!stripe || !elements) return;
-    setStatus("sending");
-    setMessage("");
-
-    const returnUrl = `${window.location.origin}/preparer-rendez-vous/${encodeURIComponent(token)}/paiement/confirmation`;
-    const result = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: returnUrl,
-        payment_method_data: {
-          billing_details: { name: cardholderName, email: receiptEmail },
-        },
-      },
-      redirect: "if_required",
-    });
-
-    if (result.error) {
-      setStatus("error");
-      setMessage(result.error.message || "Le moyen de paiement n’a pas pu être enregistré.");
-      return;
-    }
-    if (result.setupIntent?.status !== "succeeded") {
-      setStatus("error");
-      setMessage("La vérification du moyen de paiement n’est pas terminée.");
-      return;
-    }
-
-    const response = await fetch(`/api/payment-setup/${encodeURIComponent(token)}/complete`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ setupIntentId }),
-    });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      setStatus("error");
-      setMessage(body.error || "La confirmation n’a pas pu être enregistrée.");
-      return;
-    }
-    router.push(`/preparer-rendez-vous/${encodeURIComponent(token)}/paiement?enregistrement=ok`);
-    router.refresh();
-  }
-
-  return (
-    <form onSubmit={confirm} className="space-y-6">
-      <div className="rounded-2xl border bg-white p-5">
-        <PaymentElement
-          options={{
-            layout: "tabs",
-            fields: { billingDetails: { name: "never", email: "never" } },
-          }}
-        />
-      </div>
-      {status === "error" ? (
-        <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-900">{message}</p>
-      ) : null}
-      <button
-        disabled={!stripe || !elements || status === "sending"}
-        className="w-full rounded-2xl bg-green-800 px-6 py-4 text-lg font-semibold text-white shadow-sm hover:bg-green-900 disabled:opacity-60"
-      >
-        {status === "sending" ? "Enregistrement sécurisé…" : "Enregistrer ce moyen de paiement"}
-      </button>
-      <p className="text-center text-xs leading-relaxed text-gray-500">
-        La saisie est sécurisée et traitée directement par Stripe. Le site ne reçoit jamais
-        le numéro complet de votre carte ni son cryptogramme.
-      </p>
-    </form>
-  );
-}
-
-export default function PaymentSetupForm({
+function UnifiedPaymentForm({
   token,
   defaultEmail,
 }: {
@@ -125,19 +27,30 @@ export default function PaymentSetupForm({
   defaultEmail: string;
 }) {
   const router = useRouter();
+  const stripe = useStripe();
+  const elements = useElements();
   const [plan, setPlan] = useState<PaymentPlan>("single");
   const [currency, setCurrency] = useState<PaymentCurrency>("ils");
-  const [setup, setSetup] = useState<StripeSetup | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  async function initialize(event: React.FormEvent<HTMLFormElement>) {
+  async function savePaymentMethod(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus("sending");
-    setMessage("");
+    if (!stripe || !elements || status === "sending") return;
+
     const form = new FormData(event.currentTarget);
     const cardholderName = String(form.get("cardholderName") || "").trim();
     const receiptEmail = String(form.get("receiptEmail") || "").trim();
+    setStatus("sending");
+    setMessage("");
+
+    const validation = await elements.submit();
+    if (validation.error) {
+      setStatus("error");
+      setMessage(validation.error.message || "Veuillez vérifier le moyen de paiement indiqué.");
+      return;
+    }
+
     const response = await fetch(`/api/payment-setup/${encodeURIComponent(token)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,53 +75,56 @@ export default function PaymentSetupForm({
       router.refresh();
       return;
     }
-    if (!body.clientSecret || !body.publishableKey || !body.setupIntentId) {
+    if (!body.clientSecret || !body.setupIntentId) {
       setStatus("error");
       setMessage("La réponse de Stripe est incomplète.");
       return;
     }
-    setSetup({
-      clientSecret: body.clientSecret,
-      setupIntentId: body.setupIntentId,
-      stripePromise: loadStripe(body.publishableKey),
-      cardholderName,
-      receiptEmail,
-    });
-    setStatus("idle");
-  }
 
-  if (setup) {
-    return (
-      <div className="space-y-6">
-        <div className="rounded-2xl border border-green-200 bg-green-50 p-5 text-sm leading-relaxed text-green-950">
-          <strong>Aucun débit maintenant.</strong> Vous enregistrez uniquement un moyen de
-          paiement pour {PAYMENT_OPTIONS[plan].label.toLowerCase()} de {formatPaymentAmount(paymentAmount(plan, currency), currency)}.
-        </div>
-        <Elements
-          stripe={setup.stripePromise}
-          options={{
-            clientSecret: setup.clientSecret,
-            appearance: {
-              theme: "stripe",
-              variables: { colorPrimary: "#166534", borderRadius: "12px" },
-            },
-          }}
-        >
-          <SecurePaymentElement
-            token={token}
-            setupIntentId={setup.setupIntentId}
-            cardholderName={setup.cardholderName}
-            receiptEmail={setup.receiptEmail}
-          />
-        </Elements>
-      </div>
-    );
+    const returnUrl = `${window.location.origin}/preparer-rendez-vous/${encodeURIComponent(token)}/paiement/confirmation`;
+    const result = await stripe.confirmSetup({
+      elements,
+      clientSecret: body.clientSecret,
+      confirmParams: {
+        return_url: returnUrl,
+        payment_method_data: {
+          billing_details: { name: cardholderName, email: receiptEmail },
+        },
+      },
+      redirect: "if_required",
+    });
+
+    if (result.error) {
+      setStatus("error");
+      setMessage(result.error.message || "Le moyen de paiement n’a pas pu être enregistré.");
+      return;
+    }
+    if (result.setupIntent?.status !== "succeeded") {
+      setStatus("error");
+      setMessage("La vérification du moyen de paiement n’est pas terminée.");
+      return;
+    }
+
+    const completion = await fetch(`/api/payment-setup/${encodeURIComponent(token)}/complete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ setupIntentId: body.setupIntentId }),
+    });
+    const completionBody = await completion.json().catch(() => ({}));
+    if (!completion.ok) {
+      setStatus("error");
+      setMessage(completionBody.error || "La confirmation n’a pas pu être enregistrée.");
+      return;
+    }
+
+    router.push(`/preparer-rendez-vous/${encodeURIComponent(token)}/paiement?enregistrement=ok`);
+    router.refresh();
   }
 
   const authorizationText = paymentAuthorizationText(plan, currency);
 
   return (
-    <form onSubmit={initialize} className="space-y-7">
+    <form onSubmit={savePaymentMethod} className="space-y-7">
       <fieldset>
         <legend className="text-lg font-semibold">Choisissez votre formule</legend>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -290,15 +206,67 @@ export default function PaymentSetupForm({
         <span>Je confirme avoir lu et accepté l’autorisation ci-dessus.</span>
       </label>
 
+      <fieldset>
+        <legend className="text-lg font-semibold">Votre moyen de paiement</legend>
+        <p className="mt-2 text-sm leading-relaxed text-gray-600">
+          Carte bancaire. Apple Pay ou Google Pay s’affichent automatiquement lorsqu’ils sont
+          disponibles sur votre appareil et votre navigateur.
+        </p>
+        <div className="mt-4 rounded-2xl border bg-white p-5">
+          <PaymentElement
+            options={{
+              layout: { type: "accordion", defaultCollapsed: false, radios: "never" },
+              paymentMethodOrder: ["card"],
+              wallets: { applePay: "auto", googlePay: "auto", link: "never" },
+              fields: { billingDetails: { name: "never", email: "never" } },
+            }}
+          />
+        </div>
+      </fieldset>
+
       {status === "error" ? (
         <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-900">{message}</p>
       ) : null}
       <button
-        disabled={status === "sending"}
+        disabled={!stripe || !elements || status === "sending"}
         className="w-full rounded-2xl bg-green-800 px-6 py-4 text-lg font-semibold text-white shadow-sm hover:bg-green-900 disabled:opacity-60"
       >
-        {status === "sending" ? "Ouverture de l’espace sécurisé…" : "Continuer vers la saisie sécurisée"}
+        {status === "sending" ? "Enregistrement sécurisé…" : "Enregistrer mon moyen de paiement"}
       </button>
+      <p className="text-center text-xs leading-relaxed text-gray-500">
+        Aucun débit n’est effectué maintenant. La saisie est traitée directement par Stripe :
+        le site ne reçoit jamais le numéro complet de votre carte ni son cryptogramme.
+      </p>
     </form>
+  );
+}
+
+export default function PaymentSetupForm({
+  token,
+  defaultEmail,
+  publishableKey,
+}: {
+  token: string;
+  defaultEmail: string;
+  publishableKey: string;
+}) {
+  const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
+
+  return (
+    <Elements
+      stripe={stripePromise}
+      options={{
+        mode: "setup",
+        setupFutureUsage: "off_session",
+        allowedPaymentMethodTypes: ["card"],
+        locale: "fr",
+        appearance: {
+          theme: "stripe",
+          variables: { colorPrimary: "#166534", borderRadius: "12px" },
+        },
+      }}
+    >
+      <UnifiedPaymentForm token={token} defaultEmail={defaultEmail} />
+    </Elements>
   );
 }

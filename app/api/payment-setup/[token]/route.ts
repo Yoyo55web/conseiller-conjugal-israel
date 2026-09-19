@@ -104,6 +104,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
       customer: customerId,
       usage: "off_session",
       automatic_payment_methods: { enabled: true },
+      allowed_payment_method_types: ["card"],
       description: `${dossier.label} — enregistrement sécurisé du moyen de paiement`,
       metadata: {
         dossier_id: dossier.id,

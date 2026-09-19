@@ -174,9 +174,9 @@ export default async function PaymentPage({ params }: { params: Promise<{ token:
     <main className="min-h-screen bg-gray-50 px-5 py-12">
       <div className="mx-auto max-w-3xl">
         <p className="text-sm font-semibold text-green-800">Étape 3 sur 3 · page privée</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Enregistrer votre moyen de paiement</h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Formule et moyen de paiement</h1>
         <p className="mt-4 leading-relaxed text-gray-700">
-          Cette étape permet d’enregistrer votre moyen de paiement en toute sécurité.
+          Choisissez votre formule puis enregistrez votre moyen de paiement sur cette même page.
           <strong> Aucun montant ne sera débité avant la première séance.</strong>
         </p>
         <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
@@ -194,7 +194,11 @@ export default async function PaymentPage({ params }: { params: Promise<{ token:
               </p>
             </div>
           ) : (
-            <PaymentSetupForm token={token} defaultEmail={defaultEmail(dossier)} />
+            <PaymentSetupForm
+              token={token}
+              defaultEmail={defaultEmail(dossier)}
+              publishableKey={stripePublishableKey()}
+            />
           )}
         </section>
       </div>
