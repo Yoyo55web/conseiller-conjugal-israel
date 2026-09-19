@@ -222,8 +222,10 @@ function UnifiedPaymentForm({
           <PaymentElement
             options={{
               layout: { type: "accordion", defaultCollapsed: false, radios: "never" },
+              business: { name: "Conseiller conjugal Israël" },
               paymentMethodOrder: ["card"],
               wallets: { applePay: "auto", googlePay: "auto", link: "never" },
+              terms: { card: "never", applePay: "never", googlePay: "never" },
               fields: { billingDetails: { name: "never", email: "never" } },
             }}
           />
