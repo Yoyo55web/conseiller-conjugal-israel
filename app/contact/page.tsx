@@ -5,7 +5,7 @@ import { buildMetadata } from "../_seo/metadata";
 const WHATSAPP_LINK =
   "https://wa.me/972585360510?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20pour%20un%20accompagnement%20conjugal.%20Pourriez-vous%20m%E2%80%99indiquer%20vos%20prochaines%20disponibilit%C3%A9s%20et%20le%20tarif%20%3F";
 
-const EMAIL = "conseiller.conjugal.israel@gmail.com";
+const EMAIL = "info@conseiller-conjugal-israel.com";
 const TEL_IL_DISPLAY = "+972 58 536 05 10";
 const TEL_IL = "+972585360510";
 const TEL_FR_DISPLAY = "+33 1 77 47 32 45";

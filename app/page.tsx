@@ -16,7 +16,7 @@ const personJsonLd = {
   jobTitle: "Conseiller conjugal",
   url: "https://www.conseiller-conjugal-israel.com/qui-sommes-nous",
   telephone: "+972585360510",
-  email: "conseiller.conjugal.israel@gmail.com",
+  email: "info@conseiller-conjugal-israel.com",
   knowsLanguage: ["fr"],
 };
 

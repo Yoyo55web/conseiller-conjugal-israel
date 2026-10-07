@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata } from "../_seo/metadata";
 
-const EMAIL = "conseiller.conjugal.israel@gmail.com";
+const EMAIL = "info@conseiller-conjugal-israel.com";
 
 export const metadata: Metadata = buildMetadata({
   title: "Politique de confidentialité",

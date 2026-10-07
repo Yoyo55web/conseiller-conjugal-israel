@@ -20,8 +20,8 @@ export default function MentionsLegalesPage() {
           Activité : conseiller conjugal<br />
           Responsable du site : Yoni Berrebi<br />
           Email :{" "}
-          <a className="underline" href="mailto:conseiller.conjugal.israel@gmail.com">
-            conseiller.conjugal.israel@gmail.com
+          <a className="underline" href="mailto:info@conseiller-conjugal-israel.com">
+            info@conseiller-conjugal-israel.com
           </a><br />
           Téléphone (Israël) :{" "}
           <a className="underline" href="tel:+972585360510">+972 58 536 05 10</a><br />
