@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {usePathname} from 'next/navigation';
+import {growthLink} from '../lib/growth-attribution';
 import config from '../data/growth/config.json';
 import {publicRoute} from '../lib/growth-shared';
 const KEY=config.projectId==='counselor'?'cci-analytics-consent-v1':'yg-analytics-consent-v1';const CHANGE=config.projectId==='counselor'?'cci-analytics-consent-change':'yg-analytics-consent-change';
@@ -8,7 +9,7 @@ export function measurementConsent(){try{return localStorage.getItem(KEY)}catch{
 export function trackGrowth(kind:'view'|'cta',testId='',variant=''){
  if(measurementConsent()!=='granted'||!publicRoute(location.pathname))return Promise.resolve();const u=new URL(location.href);return fetch('/api/growth-events',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',keepalive:true,body:JSON.stringify({kind,path:location.pathname,eventId:crypto.randomUUID(),source:u.searchParams.get('utm_source')||'',campaign:u.searchParams.get('utm_campaign')||'',testId,variant})}).then(()=>{},()=>{});
 }
-export function GrowthCTA({href,children}:{href:string;children:React.ReactNode}){const [target,setTarget]=useState(href);useEffect(()=>{fetch('/api/growth-public',{cache:'no-store'}).then(r=>r.json()).then(v=>{const test=(v.tests||[]).find((t:any)=>t.status==='active')||(v.tests||[]).find((t:any)=>t.status==='completed'&&t.winner);if(test)setTarget('/decouvrir/'+test.id)}).catch(()=>{});},[href]);return <a className="gr-button" data-growth-cta href={target}>{children}</a>;}
+export function GrowthCTA({href,children}:{href:string;children:React.ReactNode}){const [target,setTarget]=useState(href);useEffect(()=>{setTarget(growthLink(href,location.href));fetch('/api/growth-public',{cache:'no-store'}).then(r=>r.json()).then(v=>{const test=(v.tests||[]).find((t:any)=>t.status==='active')||(v.tests||[]).find((t:any)=>t.status==='completed'&&t.winner);if(test)setTarget(growthLink('/decouvrir/'+test.id,location.href))}).catch(()=>{});},[href]);return <a className="gr-button" data-growth-cta href={target}>{children}</a>;}
 export default function GrowthMetrics(){const pathname=usePathname();const [consent,setConsent]=useState<string|null>('pending'),[opened,setOpened]=useState(false);const allowed=!!publicRoute(pathname||'');
  useEffect(()=>{const refresh=()=>setConsent(measurementConsent());refresh();window.addEventListener(CHANGE,refresh);return()=>window.removeEventListener(CHANGE,refresh)},[]);
  useEffect(()=>{if(consent!=='granted'||!allowed||pathname?.startsWith('/decouvrir/'))return;const token=pathname+location.search;const w=window as Window&{__ygSeen?:string};if(w.__ygSeen!==token){w.__ygSeen=token;trackGrowth('view');}},[consent,allowed,pathname]);
