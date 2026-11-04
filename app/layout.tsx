@@ -36,6 +36,7 @@ export default function RootLayout({
             <div>© {new Date().getFullYear()} — Conseiller conjugal Israël</div>
 
             <div className="flex flex-wrap gap-6">
+              <a href="/ressources" className="hover:underline">Ressources</a>
               <a href="/tarifs" className="hover:underline">
                 Tarifs
               </a>
