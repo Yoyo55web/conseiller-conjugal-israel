@@ -145,6 +145,7 @@ export default function ConfidentialitePage() {
       <Link href="/" className="text-sm text-gray-600 underline">
         ← Retour à l’accueil
       </Link>
-    </main>
+    <section id="mesure-interne"><h2>Mesure interne des pages publiques</h2><p>Avec votre accord, nous mesurons les sessions quotidiennes, les pages publiques consultées et les clics vers nos offres. Un identifiant de session aléatoire valable 24 heures est utilisé ; seule son empreinte quotidienne est conservée. Les événements excluent le contenu des formulaires, les conversations, les coordonnées et les dossiers clients. Les catégories de sources sont limitées aux canaux commerciaux connus.</p><p>Les événements élémentaires sont purgés après une période opérationnelle de 35 jours lors des relevés ; les totaux agrégés peuvent être conservés pour suivre les résultats. Le service utilise l’hébergement Vercel et un stockage technique Neon. Les données de cette mesure sont séparées des dossiers et ne servent pas à identifier une personne. Vous pouvez refuser ou retirer votre accord depuis « Mesure d’audience » ou « Gérer mes cookies ». Le retrait arrête les nouveaux événements et efface le cookie de mesure.</p></section>
+</main>
   );
 }

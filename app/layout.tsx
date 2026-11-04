@@ -1,3 +1,4 @@
+import GrowthMetrics from '../components/GrowthMetrics';
 import type { Metadata } from "next";
 import "./globals.css";
 import AnalyticsConsent from "./_components/AnalyticsConsent";
@@ -29,7 +30,7 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         <div id="main-content" tabIndex={-1}>
-          {children}
+          {children}<GrowthMetrics />
         </div>
         <footer className="border-t">
           <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between gap-4 text-sm text-gray-500">

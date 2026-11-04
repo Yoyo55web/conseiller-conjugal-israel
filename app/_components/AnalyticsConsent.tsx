@@ -1,4 +1,5 @@
 "use client";
+import {publicRoute} from '../../lib/growth-shared';
 
 import { GoogleAnalytics, sendGAEvent } from "@next/third-parties/google";
 import Link from "next/link";
@@ -84,6 +85,7 @@ function clearAnalyticsCookies() {
 
 export default function AnalyticsConsent() {
   const pathname = usePathname();
+  const analyticsAllowed=!!publicRoute(pathname||'');
   const previousPathname = useRef(pathname);
   const consent = useSyncExternalStore(
     subscribeToConsent,
@@ -94,10 +96,10 @@ export default function AnalyticsConsent() {
 
   useEffect(() => {
     if (consent) updateGoogleConsent(consent);
-  }, [consent]);
+  }, [consent, analyticsAllowed]);
 
   useEffect(() => {
-    if (consent !== "granted") {
+    if (consent !== "granted" || !analyticsAllowed) {
       previousPathname.current = pathname;
       return;
     }
@@ -110,10 +112,10 @@ export default function AnalyticsConsent() {
       });
       previousPathname.current = pathname;
     }
-  }, [consent, pathname]);
+  }, [consent, pathname, analyticsAllowed]);
 
   useEffect(() => {
-    if (consent !== "granted") return;
+    if (consent !== "granted" || !analyticsAllowed) return;
 
     const handleTrackedLinkClick = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null;
@@ -140,13 +142,14 @@ export default function AnalyticsConsent() {
 
     document.addEventListener("click", handleTrackedLinkClick);
     return () => document.removeEventListener("click", handleTrackedLinkClick);
-  }, [consent]);
+  }, [consent, analyticsAllowed]);
 
   const saveConsent = (value: Exclude<ConsentValue, null>) => {
     updateGoogleConsent(value);
     if (value === "denied") clearAnalyticsCookies();
 
     persistConsent(value);
+    if(value==='denied')fetch('/api/growth-events',{method:'DELETE',credentials:'same-origin',keepalive:true}).catch(()=>{});
     setIsBannerOpen(false);
   };
 
@@ -160,7 +163,7 @@ export default function AnalyticsConsent() {
         Gérer mes cookies
       </button>
 
-      {consent === "granted" ? (
+      {consent === "granted" && analyticsAllowed ? (
         <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
       ) : null}
 
@@ -173,7 +176,7 @@ export default function AnalyticsConsent() {
           >
             <h2 className="text-lg font-semibold">Mesure d’audience</h2>
             <p className="mt-2 text-sm leading-relaxed text-gray-700">
-              Nous utilisons Google Analytics uniquement avec votre accord afin de
+              Nous utilisons Google Analytics et une mesure interne des pages publiques uniquement avec votre accord afin de
               comprendre la fréquentation du site et d’améliorer son contenu. Vous pouvez
               accepter, refuser ou modifier votre choix à tout moment.
             </p>

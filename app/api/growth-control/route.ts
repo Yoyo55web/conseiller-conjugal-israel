@@ -1,0 +1,3 @@
+import {equal,callGrowthHub,growthConfig,telemetryResponse} from '../../../lib/growth-bridge';
+export const dynamic='force-dynamic';export const runtime='nodejs';
+export async function POST(req:Request){const key=process.env.GROWTH_TEST_SECRET;if(!key||!equal(req.headers.get('authorization')||'','Bearer '+key))return telemetryResponse({error:'Unauthorized'},401);if(Number(req.headers.get('content-length')||0)>16000)return telemetryResponse({error:'Payload too large'},413);try{const r=await callGrowthHub('configure',{test:await req.json()});return telemetryResponse({...r,receiptUrl:growthConfig.domain+'/decouvrir/'+r.test.id});}catch{return telemetryResponse({error:'Publication unavailable'},503);}}

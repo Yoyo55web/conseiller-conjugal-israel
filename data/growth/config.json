@@ -4,5 +4,7 @@
   "ctaTitle": "Faire le point sur votre situation",
   "ctaText": "Vous pouvez prendre contact seul(e) ou en couple pour envisager un accompagnement adapté.",
   "ctaLabel": "Parler de ma demande",
-  "ctaHref": "/contact?utm_source=ressources&utm_medium=site&utm_campaign=guides"
+  "ctaHref": "/contact?utm_source=ressources&utm_medium=site&utm_campaign=guides",
+  "projectId": "counselor",
+  "domain": "https://www.conseiller-conjugal-israel.com"
 }
